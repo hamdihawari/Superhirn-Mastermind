@@ -1,0 +1,155 @@
+import tkinter as tk
+from tkinter import font
+
+root = tk.Tk()
+root.title("Übersichtsbildschirm")
+root.geometry("700x500")
+root.resizable(width=False, height=False)
+
+# Schriftart für die Überschrift (4x größer)
+standard_font = font.nametofont("TkDefaultFont")
+new_size = standard_font.actual("size") * 4
+custom_font = font.Font(size=new_size, underline=True)
+
+# --- Haupt-Frame für Überschrift + Kreise (oben links) ---
+header_frame = tk.Frame(root)
+header_frame.pack(anchor="nw", padx=10, pady=10)
+
+# 1. Überschrift (links im Frame)
+ueberschrift_Label = tk.Label(
+    header_frame,
+    text="Superhirn - Übersicht",
+    fg="green",
+    font=custom_font
+)
+ueberschrift_Label.pack(side="left")
+
+# 2. Kreise (direkt rechts neben der Überschrift)
+farben = ["red", "green", "blue", "orange"]
+for farbe in farben:
+    kreis = tk.Label(
+        header_frame,
+        text="●",
+        fg=farbe,
+        font=("Arial", 36)
+    )
+    kreis.pack(side="left", padx=2)
+
+# --- Frame für die Auswahl der Checkboxen ---
+center_frame_Variante = tk.Frame(
+    root,
+    bg="green",  # Hellgrau (kann auch "lightgrey" oder "#RRGGBB" sein)
+    borderwidth=5,  # Rahmenbreite in Pixeln
+    padx=10,       # Innenabstand links/rechts
+    pady=10        # Innenabstand oben/unten
+)
+center_frame_Variante.pack(anchor="nw", padx=10, pady=10)
+
+# Überschrift "Variante auswählen:"
+ueberschrift_Variante = tk.Label(
+    center_frame_Variante,
+    text="Variante auswählen :",
+    font=("Arial", 22),
+    bg="green"
+)
+ueberschrift_Variante.pack(anchor="w", pady=(0, 10))
+
+# Checkboxen NEBENEINANDER (ohne zusätzlichen Frame)
+superhirn_Checkbox = tk.Checkbutton(
+    center_frame_Variante,
+    text="Superhirn",
+    font=("Arial", 18),
+    bg="green"
+)
+superhirn_Checkbox.pack(side="left", padx=5, pady=(0, 10))  # side="left" für nebeneinander
+
+super_Superhirn_Checkbox = tk.Checkbutton(
+    center_frame_Variante,
+    text="Super-Superhirn",
+    font=("Arial", 18),
+    bg="green"
+)
+super_Superhirn_Checkbox.pack(side="left", padx=5, pady=(0, 10))  # side="left" für nebeneinander
+
+
+
+# --- Frame für die Auswahl der Checkboxen des Modus ---
+center_frame_Modus = tk.Frame(
+    root,
+    bg="green",
+    borderwidth=5,  # Rahmenbreite in Pixeln
+    padx=10,       # Innenabstand links/rechts
+    pady=10        # Innenabstand oben/unten
+)
+center_frame_Modus.pack(anchor="nw", padx=10, pady=10)
+
+# Überschrift "Modus auswählen:"
+ueberschrift_Modus = tk.Label(
+    center_frame_Modus,
+    text="Modus auswählen :",
+    font=("Arial", 22),
+    bg="green"
+)
+
+ueberschrift_Modus.pack(anchor="w", pady=(0, 10))
+
+# Checkboxen NEBENEINANDER (ohne zusätzlichen Frame)
+menschVSComputer_Checkbox = tk.Checkbutton(
+    center_frame_Modus,
+    text="Codierer (M-C)",
+    font=("Arial", 18),
+    bg="green"
+)
+menschVSComputer_Checkbox.pack(side="left", padx=5, pady=(0, 10))  # side="left" für nebeneinander
+
+# Checkboxen NEBENEINANDER (ohne zusätzlichen Frame)
+computerVSMensch_Checkbox = tk.Checkbutton(
+    center_frame_Modus,
+    text="Rater (C-M)",
+    font=("Arial", 18),
+    bg="green"
+)
+computerVSMensch_Checkbox.pack(side="left", padx=5, pady=(0, 10))  # side="left" für nebeneinander
+
+# Checkboxen NEBENEINANDER (ohne zusätzlichen Frame)
+computerVSComputer_Checkbox = tk.Checkbutton(
+    center_frame_Modus,
+    text="Zuschauer (C-C)",
+    font=("Arial", 18),
+    bg="green"
+)
+computerVSComputer_Checkbox.pack(side="left", padx=5, pady=(0, 10))  # side="left" für nebeneinander
+
+# --- Frame für die Auswahl der Sprache und Button zum Bestätigen---
+
+end_frame_Modus = tk.Frame(
+    root,
+    bg="lightgreen",
+    borderwidth=5, # Rahmenbreite in Pixeln
+    padx=10,       # Innenabstand links/rechts
+    pady=10        # Innenabstand oben/unten
+)
+end_frame_Modus.pack(anchor="nw", padx=10, pady=10)
+
+sprachenListe = tk.Listbox(
+    end_frame_Modus,
+    font=("Arial", 8),
+    bg="lightgreen",
+    borderwidth=5,
+)
+sprachenListe.pack(side = "left", padx=10, pady=10)
+
+# Sprachen hinzufügen
+sprachen = ["Deutsch", "Englisch"]
+for sprache in sprachen:
+    sprachenListe.insert(tk.END, sprache)
+
+bestätigenButton = tk.Button(
+    end_frame_Modus,
+    text = "Bestätigen",
+    font=("Arial", 18),
+    bg="lightgreen"
+)
+bestätigenButton.pack(side = "left", padx=100, pady=10)
+
+root.mainloop()
