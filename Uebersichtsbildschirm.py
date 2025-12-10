@@ -35,7 +35,8 @@ for farbe in farben:
     )
     kreis.pack(side="left", padx=2)
 
-# --- Frame für die Auswahl der Checkboxen ---
+# --- Frame für die Auswahl der Checkboxen der Varianten ---
+
 center_frame_Variante = tk.Frame(
     root,
     bg="green",  # Hellgrau (kann auch "lightgrey" oder "#RRGGBB" sein)
@@ -54,22 +55,23 @@ ueberschrift_Variante = tk.Label(
 )
 ueberschrift_Variante.pack(anchor="w", pady=(0, 10))
 
-# Checkboxen NEBENEINANDER (ohne zusätzlichen Frame)
-superhirn_Checkbox = tk.Checkbutton(
-    center_frame_Variante,
-    text="Superhirn",
-    font=("Arial", 18),
-    bg="green"
-)
-superhirn_Checkbox.pack(side="left", padx=5, pady=(0, 10))  # side="left" für nebeneinander
+# Liste der Varianten !! --> muss durch getter aus ENUM geändert werden
+Varianten = ["Superhirn", "Super-Superhirn"]
 
-super_Superhirn_Checkbox = tk.Checkbutton(
-    center_frame_Variante,
-    text="Super-Superhirn",
-    font=("Arial", 18),
-    bg="green"
-)
-super_Superhirn_Checkbox.pack(side="left", padx=5, pady=(0, 10))  # side="left" für nebeneinander
+# Variable, um die Auswahl zu speichern (StringVar, da wir Text-Werte haben)
+variante_auswahl = tk.StringVar(value="Superhirn")  # Standardwert
+
+# Radiobuttons für jede Variante erstellen (NEBENEINANDER)
+for variante in Varianten:
+    radiobutton = tk.Radiobutton(
+        center_frame_Variante,
+        text=variante,
+        variable=variante_auswahl,  # Alle Radiobuttons teilen sich diese Variable
+        value=variante,             # Wert, der in 'variante_auswahl' gespeichert wird
+        font=("Arial", 18),
+        bg="green"
+    )
+    radiobutton.pack(side="left", padx=5, pady=(0, 10))  # Nebeneinander anordnen
 
 
 
@@ -93,32 +95,22 @@ ueberschrift_Modus = tk.Label(
 
 ueberschrift_Modus.pack(anchor="w", pady=(0, 10))
 
-# Checkboxen NEBENEINANDER (ohne zusätzlichen Frame)
-menschVSComputer_Checkbox = tk.Checkbutton(
-    center_frame_Modus,
-    text="Codierer (M-C)",
-    font=("Arial", 18),
-    bg="green"
-)
-menschVSComputer_Checkbox.pack(side="left", padx=5, pady=(0, 10))  # side="left" für nebeneinander
+# Liste der Modi !! --> muss noch getter auf die ENUMs haben
+Modi = ["Codierer (M-C)", "Rater (C-M)", "Zuschauer (C-C)"]
 
-# Checkboxen NEBENEINANDER (ohne zusätzlichen Frame)
-computerVSMensch_Checkbox = tk.Checkbutton(
-    center_frame_Modus,
-    text="Rater (C-M)",
-    font=("Arial", 18),
-    bg="green"
-)
-computerVSMensch_Checkbox.pack(side="left", padx=5, pady=(0, 10))  # side="left" für nebeneinander
+modi_auswahl = tk.StringVar(value="Codierer (M-C)")
 
-# Checkboxen NEBENEINANDER (ohne zusätzlichen Frame)
-computerVSComputer_Checkbox = tk.Checkbutton(
-    center_frame_Modus,
-    text="Zuschauer (C-C)",
-    font=("Arial", 18),
-    bg="green"
-)
-computerVSComputer_Checkbox.pack(side="left", padx=5, pady=(0, 10))  # side="left" für nebeneinander
+for modi in Modi:
+    radiobutton = tk.Radiobutton(
+        center_frame_Modus,
+        text=modi,
+        variable=modi_auswahl,
+        value=modi, font=("Arial", 18),
+        bg="green"
+    )
+    radiobutton.pack(side="left", padx=5, pady=(0, 10))
+
+
 
 # --- Frame für die Auswahl der Sprache und Button zum Bestätigen---
 
