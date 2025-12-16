@@ -13,6 +13,7 @@ class game:
         self.secretCode=secretCode
         self.runden=List[spielRunde] = []
 
+    #berechnet schon Feedback oder in extra Methode?
     def fuehreRateversuchDurch(code:Code) -> Feedback:
         pass
 
