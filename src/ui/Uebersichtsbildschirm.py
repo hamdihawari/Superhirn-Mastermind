@@ -3,24 +3,20 @@ from tkinter import font
 
 root = tk.Tk()
 root.title("Übersichtsbildschirm")
-root.geometry("700x500")
+root.geometry("550x500")
 root.resizable(width=False, height=False)
 
-# Schriftart für die Überschrift (4x größer)
-standard_font = font.nametofont("TkDefaultFont")
-new_size = standard_font.actual("size") * 4
-custom_font = font.Font(size=new_size, underline=True)
 
 # --- Haupt-Frame für Überschrift + Kreise (oben links) ---
 header_frame = tk.Frame(root)
-header_frame.pack(anchor="nw", padx=10, pady=10)
+header_frame.pack(anchor="nw", padx=10, pady=2)
 
 # 1. Überschrift (links im Frame)
 ueberschrift_Label = tk.Label(
     header_frame,
     text="Superhirn - Übersicht",
     fg="green",
-    font=custom_font
+    font=("Arial", 30,"underline"),
 )
 ueberschrift_Label.pack(side="left")
 
@@ -39,12 +35,12 @@ for farbe in farben:
 
 center_frame_Variante = tk.Frame(
     root,
-    bg="green",  # Hellgrau (kann auch "lightgrey" oder "#RRGGBB" sein)
-    borderwidth=5,  # Rahmenbreite in Pixeln
-    padx=10,       # Innenabstand links/rechts
-    pady=10        # Innenabstand oben/unten
+    bg="green",
+    borderwidth=5,
+    padx=10,
+    pady=10
 )
-center_frame_Variante.pack(anchor="nw", padx=10, pady=10)
+center_frame_Variante.pack(anchor="nw", padx=10, pady=2,fill="x")
 
 # Überschrift "Variante auswählen:"
 ueberschrift_Variante = tk.Label(
@@ -68,10 +64,10 @@ for variante in Varianten:
         text=variante,
         variable=variante_auswahl,  # Alle Radiobuttons teilen sich diese Variable
         value=variante,             # Wert, der in 'variante_auswahl' gespeichert wird
-        font=("Arial", 18),
+        font=("Arial", 14),
         bg="green"
     )
-    radiobutton.pack(side="left", padx=5, pady=(0, 10))  # Nebeneinander anordnen
+    radiobutton.pack(side="left", padx=25, pady=(0, 10))  # Nebeneinander anordnen
 
 
 
@@ -83,7 +79,7 @@ center_frame_Modus = tk.Frame(
     padx=10,       # Innenabstand links/rechts
     pady=10        # Innenabstand oben/unten
 )
-center_frame_Modus.pack(anchor="nw", padx=10, pady=10)
+center_frame_Modus.pack(anchor="nw", padx=10, pady=2,fill="x")
 
 # Überschrift "Modus auswählen:"
 ueberschrift_Modus = tk.Label(
@@ -105,7 +101,7 @@ for modi in Modi:
         center_frame_Modus,
         text=modi,
         variable=modi_auswahl,
-        value=modi, font=("Arial", 18),
+        value=modi, font=("Arial", 14),
         bg="green"
     )
     radiobutton.pack(side="left", padx=5, pady=(0, 10))
@@ -116,12 +112,12 @@ for modi in Modi:
 
 end_frame_Modus = tk.Frame(
     root,
-    bg="lightgreen",
+    bg="green",
     borderwidth=5, # Rahmenbreite in Pixeln
     padx=10,       # Innenabstand links/rechts
     pady=10        # Innenabstand oben/unten
 )
-end_frame_Modus.pack(anchor="nw", padx=10, pady=10)
+end_frame_Modus.pack(anchor="nw", padx=10, pady=2,fill="x")
 
 sprachenListe = tk.Listbox(
     end_frame_Modus,
@@ -140,7 +136,7 @@ bestätigenButton = tk.Button(
     end_frame_Modus,
     text = "Bestätigen",
     font=("Arial", 18),
-    bg="lightgreen"
+    bg="darkgreen"
 )
 bestätigenButton.pack(side = "left", padx=100, pady=10)
 
