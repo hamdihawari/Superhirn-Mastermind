@@ -116,7 +116,7 @@ def create_uebersicht_frame(root, next_callback):
         end_frame_Modus,
         font=("Arial", 8),
         bg="lightgreen",
-        borderwidth=5,
+        borderwidth=2,
     )
     sprachenListe.pack(side="left", padx=10, pady=10)
 
@@ -129,10 +129,12 @@ def create_uebersicht_frame(root, next_callback):
         end_frame_Modus,
         text="Bestätigen",
         command=next_callback,
-        font=("Arial", 18),
-        bg="darkgreen"
+        font=("Arial", 14, "bold"),
+        bg="darkgreen",
+        borderwidth = 5,
+        padx = 10,
+        pady = 2
     )
     bestätigenButton.pack(side="left", padx=100, pady=10)
 
     return frame
-
