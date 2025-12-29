@@ -1,7 +1,7 @@
 import tkinter as tk
+from src.spiel.variante import Variante
 
-
-def create_uebersicht_frame(root, next_callback):
+def create_uebersicht_frame(root, next_callback, set_variante_callback):
     frame = tk.Frame(root)
     frame.pack(fill="both", expand=True) # WICHTIG: Frame füllt das Fenster aus!
 
@@ -48,23 +48,48 @@ def create_uebersicht_frame(root, next_callback):
     )
     ueberschrift_Variante.pack(anchor="w", pady=(0, 10))
 
-    # Liste der Varianten !! --> muss durch getter aus ENUM geändert werden
-    Varianten = ["Superhirn", "Super-Superhirn"]
+
+
+
+
+
+    # --- DYNAMISCHE VARIANTEN-LISTE AUS ENUM ---
+    # Mapping von Variante-Enum zu Anzeigenamen
+    variante_namen = {
+        Variante.SUPER: "Superhirn",
+        Variante.SUPERSUPER: "Super-Superhirn"
+    }
 
     # Variable, um die Auswahl zu speichern (StringVar, da wir Text-Werte haben)
     variante_auswahl = tk.StringVar(value="Superhirn")  # Standardwert
 
-    # Radiobuttons für jede Variante erstellen (NEBENEINANDER)
-    for variante in Varianten:
+    # Callback-Funktion, die bei Änderung der Auswahl aufgerufen wird
+    def on_variante_change(*args):
+        # Mapping von Anzeigenamen zurück zum Enum-Wert
+        name_to_enum = {v: k for k, v in variante_namen.items()}
+        selected_enum = name_to_enum[variante_auswahl.get()]
+        set_variante_callback(selected_enum)  # Enum-Wert an Controller übergeben
+
+    # StringVar mit Callback verknüpfen (wird bei Änderung aufgerufen)
+    variante_auswahl.trace_add("write", on_variante_change)
+
+    # Radiobuttons für jede Variante erstellen
+    for variante_enum, anzeige_name in variante_namen.items():
         radiobutton = tk.Radiobutton(
             center_frame_Variante,
-            text=variante,
-            variable=variante_auswahl,  # Alle Radiobuttons teilen sich diese Variable
-            value=variante,  # Wert, der in 'variante_auswahl' gespeichert wird
+            text=anzeige_name,
+            variable=variante_auswahl,
+            value=anzeige_name,
             font=("Arial", 14),
             bg="green"
         )
-        radiobutton.pack(side="left", padx=25, pady=(0, 10))  # Nebeneinander anordnen
+        radiobutton.pack(side="left", padx=25, pady=(0, 10))
+
+
+
+
+
+
 
     # --- Frame für die Auswahl der Checkboxen des Modus ---
     center_frame_Modus = tk.Frame(
