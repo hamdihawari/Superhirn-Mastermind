@@ -1,29 +1,63 @@
 from typing import List
 
+from src.spiel.farbe import Farbe
 from src.spiel.spielCodes import Code, Feedback
-from src.spiel.strategie import player
+from src.spiel.spielrunde import SpielRunde
+from src.spiel.strategie.player import Player
 from src.spiel.variante import Variante
+from typing import Optional
 
 
-class game:
-    def __init__(self,codierer:player, rater:player,variante:Variante,secretCode:Code):
+class Game:
+    def __init__(self,codierer:Player, rater:Player,variante:Variante,secret_code:Code):
         self.codierer=codierer
         self.rater=rater
         self.variante=variante
-        self.secretCode=secretCode
-        self.runden=List[spielRunde] = []
+        self.secret_code=secret_code
+        self.runden: List[SpielRunde] = []
+        self.erfolgreich = False
 
-    #berechnet schon Feedback oder in extra Methode?
-    def fuehreRateversuchDurch(code:Code) -> Feedback:
-        pass
+    def fuehreRateversuchDurch(self,code:Code) -> Feedback:
+        feedback = self.berechneFeedback(code)
+        erfolgreich = feedback.schwarz == self.variante.steckplaetze
+
+        runde = SpielRunde(
+            code=code,
+            feedback=feedback,
+            rundenNr=len(self.runden) + 1,
+            erfolgreich=erfolgreich
+        )
+        self.runden.append(runde)
+        self.istFertig()
+        return feedback
 
     def istFertig(self) -> bool:
-        pass
+        return any(r.erfolgreich for r in self.runden) or \
+               len(self.runden) >= self.variante.maxVersuche
 
-class spielRunde:
-    def __init__(self,code:Code,feedback:Feedback,rundenNr:int,erfolgreich:bool):
-        self.code=code
-        self.feedback=feedback
-        self.rundenNr=rundenNr
-        self.erfolgreich=erfolgreich
+
+    #Hilfsmethode für fuehreRateversuchDurch
+
+    def berechneFeedback(self, rate_code: Code) -> Feedback:
+        # Listen mit Optional[Farbe] erstellen
+        geheim: list[Optional[Farbe]] = list(self.secret_code.farben)
+        geraten: list[Optional[Farbe]] = list(rate_code.farben)
+
+        schwarz = 0
+        weiss = 0
+
+        for i in range(len(geheim)):
+            if geraten[i] == geheim[i]:
+                schwarz += 1
+                geheim[i] = None
+                geraten[i] = None
+
+        for i in range(len(geraten)):
+            if geraten[i] is not None and geraten[i] in geheim:
+                weiss += 1
+                index = geheim.index(geraten[i])
+                geheim[index] = None
+
+        return Feedback(schwarz, weiss)
+
 
