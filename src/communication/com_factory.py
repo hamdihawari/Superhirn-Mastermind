@@ -10,5 +10,5 @@ class ComFactory(ABC):
         self.serializer = serializer
 
     @abstractmethod
-    def create(self) -> ComPort:
+    def createCom(self) -> ComPort:
         pass

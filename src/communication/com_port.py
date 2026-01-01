@@ -8,6 +8,10 @@ class ComPort(ABC):
     """
 
 
+    @abstractmethod
+    def start(self):
+        pass
+
     # Sendet eine Nachricht über den jeweiligen Kommunikationskanal
     @abstractmethod
     def send(self, message: GameMessage):
