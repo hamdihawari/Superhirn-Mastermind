@@ -6,11 +6,11 @@ from src.ui.sprache import Sprache
 
 def create_uebersicht_frame(root, next_callback, set_variante_callback, set_modus_callback,set_sprache_callback, sprache ):
     frame = tk.Frame(root)
-    frame.pack(fill="both", expand=True) # WICHTIG: Frame füllt das Fenster aus!
+    frame.pack(fill="both", expand=True)
 
     # 1. Header-Frame für Überschrift + Kreise
     header_frame = tk.Frame(frame)
-    header_frame.pack(fill="x", pady=10)  # Füllt die Breite aus
+    header_frame.pack(fill="x", pady=10)
 
     # Überschrift (links im header_frame)
     ueberschrift_Label = tk.Label(
@@ -50,10 +50,6 @@ def create_uebersicht_frame(root, next_callback, set_variante_callback, set_modu
         bg="green"
     )
     ueberschrift_Variante.pack(anchor="w", pady=(0, 10))
-
-
-
-
 
 
     # ------------------------ Variantenauswahl : DYNAMISCHE VARIANTEN-LISTE AUS ENUM ---------------------------
@@ -191,5 +187,4 @@ def create_uebersicht_frame(root, next_callback, set_variante_callback, set_modu
         pady=2
     )
     bestaetigenButton.pack(pady=10)
-
     return frame

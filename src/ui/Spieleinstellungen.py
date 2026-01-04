@@ -1,12 +1,14 @@
 import tkinter as tk
 from tkinter import ttk
 
+from src.spiel.spielCodes import Code
 from src.spiel.variante import Variante, Farbe
 
-def create_spieleinstellungen_superhirn_frame(root, back_callback,anzahl_steckplaetze,spielVariante, spielmodus, sprache):
+def create_spieleinstellungen_superhirn_frame(root, back_callback,next_callback,anzahl_steckplaetze,spielVariante, spielmodus, sprache):
     frame = tk.Frame(root)
 
-    farben = [farbe.name for farbe in spielVariante.erlaubteFarben]                             # Farben abhängig von der Variante des Spiels zuweisen
+    # Liste für die StringVars der Farbauswahl (global im Frame)
+    farbe_vars = []  # Speichert alle StringVars der OptionMenüs
 
     # --- Überschrift (oben) ---
     header_frame = tk.Frame(frame)
@@ -21,6 +23,7 @@ def create_spieleinstellungen_superhirn_frame(root, back_callback,anzahl_steckpl
 
     # --------------- Frame für die Farbauswahl ------------------
 
+
     # --- Farbauswahl (nur sichtbar, wenn modus.show_farbe = True) ---
     if spielmodus.show_farbe:
         upperCenter_frame = tk.Frame(frame, bg="green", borderwidth=5, padx=10, pady=2)
@@ -34,6 +37,8 @@ def create_spieleinstellungen_superhirn_frame(root, back_callback,anzahl_steckpl
             bg="green"
         )
         farbauswahl_label.grid(row=0, column=0, columnspan=2, sticky="w")
+
+        farben = [farbe.name for farbe in spielVariante.erlaubteFarben]                                                     # Farben abhängig von der Variante des Spiels zuweisen
 
         # Dynamische Erstellung der Steckplätze
         for i in range(1, anzahl_steckplaetze + 1):
@@ -52,7 +57,8 @@ def create_spieleinstellungen_superhirn_frame(root, back_callback,anzahl_steckpl
             )
             nummer_label.pack(side="left", padx=5)
 
-            farbe_var = tk.StringVar(value=farben[0])
+            farbe_var = tk.StringVar(value=farben[0])                                           # Standardfarbe & aktuell ausgewählte
+            farbe_vars.append(farbe_var)                                                        # Zur Liste hinzufügen
             farbe_option = tk.OptionMenu(block_frame, farbe_var, *farben)
             farbe_option.config(bg="white", width=15, font=("Arial", 12))
             farbe_option.pack(side="left", padx=5)
@@ -137,10 +143,21 @@ def create_spieleinstellungen_superhirn_frame(root, back_callback,anzahl_steckpl
         )
         zurückButton_Spieleinstellungen.pack(side="left", padx=20, pady=2)
 
+        # Funktion zum Auslesen der ausgewählten Farben und Erstellen des Codes
+        def on_bestaetigen():
+            # Ausgewählte Farben aus den StringVars auslesen
+            ausgewählte_farben = [farbe_var.get() for farbe_var in farbe_vars]
+
+            # Erstelle ein Code-Objekt mit den ausgewählten Farben
+            code = Code(farben=[Farbe[farbe] for farbe in ausgewählte_farben])  # Konvertiere Namen zu Farbe-Enum
+
+            # Rufe die set_code-Funktion auf
+            next_callback(code)
+
         bestätigenButton = tk.Button(
             zeiten_frame,
             text=sprache.bestaetigen,
-            # command=                      # folgt noch mit der Spielübersicht
+            command=on_bestaetigen,  # Funktion zum Auslesen der Farben
             bg="green",
             font=("Arial", 14, "bold"),
             borderwidth=5,

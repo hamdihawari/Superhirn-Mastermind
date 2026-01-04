@@ -13,6 +13,7 @@ class Sprache(Enum):
         "algorithmus_auswaehlen": "Algorithmus auswählen:",
         "zeitverzoegerung": "Zeitverzögerung der Maschine in Sekunden:",
         "zurueck": "Zurück"
+       #ä "starten": "Starten"
     }
 
     ENGLISCH = {

@@ -3,9 +3,11 @@ from importlib.util import source_hash
 
 from Uebersichtsbildschirm import create_uebersicht_frame
 from Spieleinstellungen import create_spieleinstellungen_superhirn_frame  # Expliziter Import
+from spieloberfläche import create_spieloberfläche
 from src.anwendung.modus import Modus
 from src.spiel.variante import Variante  # Variante-Klasse importieren
 from src.ui.sprache import Sprache
+from src.spiel.spielCodes import Code
 
 # Hauptfenster
 root = tk.Tk()
@@ -15,12 +17,15 @@ root.resizable(False, False)
 
 # Globale Variablen für die Frames
 uebersicht_frame = None
-spieleinstellungen_frame = None  # Jetzt hinzufügen
+spieleinstellungen_frame = None
+spieloberflaeche_frame = None
+
 
 spielVariante = Variante.SUPER          # Standardvariante
 spielModus = Modus.M_C                  # Standardmodus
-#spielAlgorithmus =                  # Mocking, danach dann
-spielSprache = Sprache.ENGLISCH         # Standardsprache
+#spielAlgorithmus =                     # Mocking, danach dann
+spielSprache = Sprache.DEUTSCH         # Standardsprache
+spielcode = None
 
 # Funktion zum Setzen der Variante (wird von der UI aufgerufen)
 def set_variante(variante: Variante):
@@ -39,6 +44,27 @@ def set_sprache(sprache: Sprache):
     spielSprache = sprache
     print(f"Sprache gesetzt auf: {sprache.name}")
 
+# Callback-Funktion für den "Bestätigen"-Button
+def on_code_bestaetigt(code: Code):
+    global spieloberflaeche_frame, spielcode  # Globale Variablen deklarieren
+    set_code(code)  # Setze den ausgewählten Code
+
+    # Verstecke die Spieleinstellungen
+    if spieleinstellungen_frame:
+        spieleinstellungen_frame.pack_forget()
+
+    # Erstelle die Spieloberfläche
+    if spieloberflaeche_frame:
+        spieloberflaeche_frame.destroy()
+
+    spieloberflaeche_frame = create_spieloberfläche(root)
+    spieloberflaeche_frame.pack(fill="both", expand=True)
+
+def set_code(code: Code):
+    global spielcode
+    spielcode = code
+    print(f"aktueller Code ist : {code.farben}")
+
 def show_spieleinstellungen():
     global spieleinstellungen_frame, uebersicht_frame
     print(f"DEBUG: Aktuelle Variante: {spielVariante}, Steckplätze: {spielVariante.steckplaetze}")
@@ -49,7 +75,8 @@ def show_spieleinstellungen():
         spieleinstellungen_frame.destroy()  # Alten Frame löschen
     spieleinstellungen_frame = create_spieleinstellungen_superhirn_frame(
         root,
-        show_uebersicht,                                                    # Zurück-Button-Callback
+        show_uebersicht,
+        on_code_bestaetigt,
         spielVariante.steckplaetze,                                         # Anzahl an Steckplätze werden übergeben
         spielVariante,
         spielModus,
