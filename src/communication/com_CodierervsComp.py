@@ -12,5 +12,5 @@ class PlayerCoderFactory(ComFactory):
         self.server_address = server_address
         self.server_port = server_port
 
-    def create(self):
+    def createCom(self):
         return ComTcp(self.server_address, self.server_port, self.serializer)

@@ -12,6 +12,6 @@ class PlayerGuesserFactory(ComFactory):
         self.server_address = server_address
         self.server_port = server_port
 
-    def create(self):
+    def createCom(self):
         # erzeugt einen TCP-Port für Server-Kommunikation
         return ComTcp(self.server_address, self.server_port, self.serializer)

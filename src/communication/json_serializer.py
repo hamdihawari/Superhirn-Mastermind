@@ -1,5 +1,5 @@
 import json
-from .game_message import GameMessage, MessageType
+from .game_message import GameMessage
 
 class JsonSerializer:
     """
@@ -13,9 +13,9 @@ class JsonSerializer:
             "gameId": message.game_id,
             "gamerId": message.gamer_id,
             "positions": message.positions,
-            "colours": message.colours,
+            "colors": message.colors,
             "value": message.value,
-            "type": message.msg_type.value
+
         })
 
     # Wandelt einen JSON-String zurück in eine GameMessage
@@ -25,7 +25,7 @@ class JsonSerializer:
             game_id=obj["gameId"],
             gamer_id=obj["gamerId"],
             positions=obj["positions"],
-            colours=obj["colours"],
+            colors=obj["colors"],
             value=obj["value"],
-            msg_type=MessageType(obj["type"])
+
         )

@@ -1,5 +1,8 @@
 from abc import ABC, abstractmethod
-from .game_message import GameMessage
+from src.spiel.spielCodes import Code, Feedback
+from src.anwendung.spielparameter import Modus
+from src.spiel.variante import Variante
+
 
 class ComPort(ABC):
     """
@@ -7,17 +10,16 @@ class ComPort(ABC):
     Definiert, wie Nachrichten gesendet und empfangen werden.
     """
 
+    def __init__(self, ComFactory):
+        self.factory = ComFactory
+
 
     @abstractmethod
-    def start(self):
+    def start(self, modus: Modus, variante: Variante):
         pass
 
     # Sendet eine Nachricht über den jeweiligen Kommunikationskanal
     @abstractmethod
-    def send(self, message: GameMessage):
+    def send(self, code: Code) -> Feedback:
         pass
 
-    # Empfängt eine Nachricht über den jeweiligen Kommunikationskanal
-    @abstractmethod
-    def receive(self) -> GameMessage:
-        pass
