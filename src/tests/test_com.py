@@ -15,6 +15,11 @@ def jsonMessage():
     json = abc.serialize(message)
     return json
 
+@pytest.fixture
+def super_superhirn_message():
+    message = GameMessage(0, "", 5, 8, "")
+    return message
+
 
 def test_jsonSerializer(startMessage, jsonMessage):
     abc = JsonSerializer()
@@ -28,13 +33,21 @@ def test_jsonDeserializer(jsonMessage, startMessage):
     print (jsonMessage)
     assert gameMessage == startMessage
 
-def test_server_message(jsonMessage):
+def test_handshake_superhirn(jsonMessage):
     response = requests.post(
-        "http://localhost:5000/game", json = jsonMessage)
+        "http://localhost:5000/", json = jsonMessage)
 
 
     print (response.status_code)
     print (response.json())
+
+
+def test_handshake_super_superhirn(super_superhirn_message):
+    response = requests.post("http://localhost:5000/game", json = super_superhirn_message)
+
+    print(response.status_code)
+    print(response.json())
+
 
 
 
