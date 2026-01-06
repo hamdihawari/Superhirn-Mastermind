@@ -46,18 +46,17 @@ def set_sprache(sprache: Sprache):
 
 # Callback-Funktion für den "Bestätigen"-Button
 def on_code_bestaetigt(code: Code):
-    global spieloberflaeche_frame, spielcode  # Globale Variablen deklarieren
-    set_code(code)  # Setze den ausgewählten Code
+    global spieloberflaeche_frame, spielcode
+    set_code(code)
 
-    # Verstecke die Spieleinstellungen
     if spieleinstellungen_frame:
         spieleinstellungen_frame.pack_forget()
 
-    # Erstelle die Spieloberfläche
     if spieloberflaeche_frame:
         spieloberflaeche_frame.destroy()
 
-    spieloberflaeche_frame = create_spieloberfläche(root)
+    # Übergabe der spielVariante an create_spieloberfläche
+    spieloberflaeche_frame = create_spieloberfläche(root, spielVariante)
     spieloberflaeche_frame.pack(fill="both", expand=True)
 
 def set_code(code: Code):
