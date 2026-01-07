@@ -15,7 +15,7 @@ def create_spieleinstellungen_superhirn_frame(
     frame = tk.Frame(root)
     farbe_vars = []  # Speichert alle StringVars der OptionMenüs
 
-    # --- Rest deines Codes (unverändert) ---
+
     header_frame = tk.Frame(frame)
     header_frame.pack(anchor="nw", pady=10)
 
@@ -119,34 +119,42 @@ def create_spieleinstellungen_superhirn_frame(
         zeit_option.config(bg="white", width=15, font=("Arial", 12))
         zeit_option.pack(side="left", padx=5, pady=2)
 
-        zurückButton_Spieleinstellungen = tk.Button(
-            zeiten_frame,
-            text=sprache.zurueck,
-            command=back_callback,
-            bg="green",
-            font=("Arial", 14, "bold"),
-            borderwidth=5,
-            padx=10,
-            pady=2,
-        )
-        zurückButton_Spieleinstellungen.pack(side="left", padx=20, pady=2)
 
-        def on_spiel_start():
-            ausgewählte_farben = [farbe_var.get() for farbe_var in farbe_vars]
-            ausgewählte_zeit = int(zeit_var.get())
-            code = Code(farben=[Farbe[farbe] for farbe in ausgewählte_farben])
-            spielstart_callback(code, ausgewählte_zeit)  # Ruft on_code_spiel_start auf
+    def on_spiel_start():
+        # 1. Farbauswahl (immer vorhanden, wenn show_farbe=True)
+        ausgewählte_farben = [farbe_var.get() for farbe_var in farbe_vars]
+        code = Code(farben=[Farbe[farbe] for farbe in ausgewählte_farben])
 
-        bestätigenButton = tk.Button(
-            zeiten_frame,
-            text=sprache.starten,
-            command=on_spiel_start,
-            bg="green",
-            font=("Arial", 14, "bold"),
-            borderwidth=5,
-            padx=10,
-            pady=2
-        )
-        bestätigenButton.pack(side="left", padx=10, pady=2)
+        # 2. Zeitauswahl (nur abfragen, wenn show_zeit=True)
+        ausgewählte_zeit = 0  # Standardwert, falls keine Zeitauswahl existiert
+        if spielmodus.show_zeit:
+            ausgewählte_zeit = int(zeit_var.get())  # Nur abfragen, wenn zeit_var existiert
+
+        # 3. Spiel starten
+        spielstart_callback(code, ausgewählte_zeit)
+
+    zurückButton_Spieleinstellungen = tk.Button(
+        header_frame,
+        text=sprache.zurueck,
+        command=back_callback,
+        bg="green",
+        font=("Arial", 14, "bold"),
+        borderwidth=5,
+        padx=10,
+        pady=2,
+    )
+    zurückButton_Spieleinstellungen.pack(side="left", padx=20, pady=2)
+
+    bestätigenButton = tk.Button(
+        header_frame,
+        text=sprache.starten,
+        command=on_spiel_start,
+        bg="green",
+        font=("Arial", 14, "bold"),
+        borderwidth=5,
+        padx=10,
+        pady=2
+    )
+    bestätigenButton.pack(side="right", padx=10, pady=2)
 
     return frame

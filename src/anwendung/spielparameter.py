@@ -7,10 +7,17 @@ from src.ui.sprache import Sprache
 
 
 class Spielparameter:
-    def __init__(self,variante: Variante,modus: Modus,algorithmus:str,delay: int, sprache: Sprache, code: Code):
+    def __init__(
+            self,
+            variante: Variante,
+            modus: Modus,
+            algorithmus:str | None = None,
+            delay: int = 1,
+            code: Code | None = None
+    ):
+
         self.variante = variante
         self.modus = modus
         self.algorithmus = algorithmus
         self.delay = delay
-        self.sprache = sprache
         self.code = code

@@ -8,7 +8,7 @@ from src.spiel.spielCodes import Code
 # Hauptfenster
 root = tk.Tk()
 root.title("Superhirn")
-root.geometry("550x550")
+root.geometry("600x550")
 root.resizable(False, False)
 
 # Globale Variablen für die Frames
@@ -109,13 +109,14 @@ def show_spieleinstellungen():
 def on_code_spiel_start(code: Code, zeit: int):
     global spieloberflaeche_frame
 
+    # Algorithmus wird auf None gesetzt wenn dieser nicht Maschine gegen Computer ist
+    algorithmus = spielAlgorithmus if spielModus == Modus.M_C else None
 
     spielparameter = Spielparameter(
         variante=spielVariante,
         modus=spielModus,
-        algorithmus=spielAlgorithmus,
+        algorithmus=algorithmus,
         delay=zeit,
-        sprache=spielSprache,
         code=code
     )
 
@@ -125,7 +126,6 @@ def on_code_spiel_start(code: Code, zeit: int):
     print(f"Modus: {spielparameter.modus.name}")
     print(f"Algorithmus: {spielparameter.algorithmus}")
     print(f"Verzögerung: {spielparameter.delay} Sekunden")
-    print(f"Sprache: {spielparameter.sprache.name}")
     print(f"Code: {[f.name for f in spielparameter.code.farben]}")
 
     # Globale Variablen aktualisieren
@@ -144,7 +144,7 @@ def on_code_spiel_start(code: Code, zeit: int):
 
     spieloberflaeche_frame = create_spieloberfläche(
         root,
-        spielVariante,
+        spielparameter
     )
     spieloberflaeche_frame.pack(fill="both", expand=True)
 

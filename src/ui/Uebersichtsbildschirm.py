@@ -89,9 +89,9 @@ def create_uebersicht_frame(root, next_callback, set_variante_callback, set_modu
     center_frame_Modus = tk.Frame(
         frame,
         bg="green",
-        borderwidth=5,  # Rahmenbreite in Pixeln
-        padx=10,  # Innenabstand links/rechts
-        pady=10  # Innenabstand oben/unten
+        borderwidth=5,
+        padx=10,
+        pady=10
     )
     center_frame_Modus.pack(fill="x", padx=10, pady=2)
 
@@ -107,7 +107,9 @@ def create_uebersicht_frame(root, next_callback, set_variante_callback, set_modu
     modus_namen = {                                                             # Mapping von den Anzeigenamen zu Modus-Enum
         Modus.M_C: Modus.M_C.description,
         Modus.C_M: Modus.C_M.description,
-        Modus.C_C: Modus.C_C.description
+        Modus.C_C: Modus.C_C.description,
+        Modus.M_C_ONLINE: Modus.M_C_ONLINE.description,
+        Modus.C_C_ONLINE: Modus.C_C_ONLINE.description
     }
 
     modus_auswahl = tk.StringVar(value=Modus.M_C.description)                   # Standard ist Mensch der Codierer

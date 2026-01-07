@@ -11,18 +11,32 @@ class Modus(Enum):
 
     # Modus: Computer-Mensch (C-M, Rater)
     C_M = {
-        "show_farbe": False,     # Farbauswahl ausblenden
-        "show_algorithmus": False,  # Algorithmus ausblenden
-        "show_zeit": True,       # Nur Zeit anzeigen
+        "show_farbe": False,
+        "show_algorithmus": False,
+        "show_zeit": True,
         "description": "(C-M)"
     }
 
     # Modus: Computer-Computer (C-C, Zuschauer)
     C_C = {
-        "show_farbe": False,     # Alles ausblenden
+        "show_farbe": False,
         "show_algorithmus": False,
         "show_zeit": True,
         "description": "(C-C)"
+    }
+    # Modus: Mensch-Computer (M-C-Online, Rater)
+    M_C_ONLINE = {
+        "show_farbe": False,
+        "show_algorithmus": False,
+        "show_zeit": False,
+        "description": "(M-C-Online)"
+    }
+    # Modus: Computer-Computer (C-C-Online, Rater)
+    C_C_ONLINE = {
+        "show_farbe": False,
+        "show_algorithmus": False,
+        "show_zeit": True,
+        "description": "(C-C-Online)"
     }
 
     def __init__(self, config):
