@@ -1,11 +1,7 @@
 import tkinter as tk
-from importlib.util import source_hash
-
-from Uebersichtsbildschirm import create_uebersicht_frame
-from Spieleinstellungen import create_spieleinstellungen_superhirn_frame  # Expliziter Import
-from spieloberfläche import create_spieloberfläche
 from src.anwendung.modus import Modus
-from src.spiel.variante import Variante  # Variante-Klasse importieren
+from src.anwendung.spielparameter import Spielparameter
+from src.spiel.variante import Variante
 from src.ui.sprache import Sprache
 from src.spiel.spielCodes import Code
 
@@ -20,78 +16,55 @@ uebersicht_frame = None
 spieleinstellungen_frame = None
 spieloberflaeche_frame = None
 
-
-spielVariante = Variante.SUPER          # Standardvariante
-spielModus = Modus.M_C                  # Standardmodus
-#spielAlgorithmus =                     # Mocking, danach dann
-spielSprache = Sprache.DEUTSCH         # Standardsprache
+# Standardwerte
+spielVariante = Variante.SUPER
+spielModus = Modus.M_C
+spielAlgorithmus = "Knuth"
+spielSprache = Sprache.DEUTSCH
 spielcode = None
+spielZeit = None
 
-# Funktion zum Setzen der Variante (wird von der UI aufgerufen)
+# --- Funktionen zum Setzen der Parameter ---
 def set_variante(variante: Variante):
     global spielVariante
     spielVariante = variante
-    print(f"Variante gesetzt auf: {spielVariante}")  # Debug-Ausgabe
-    print(spielVariante.steckplaetze)
 
-def set_modus(modus: str):
+
+def set_modus(modus: Modus):
     global spielModus
     spielModus = modus
-    print(f"Modus gesetzt auf: {modus.description}")
+
 
 def set_sprache(sprache: Sprache):
     global spielSprache
     spielSprache = sprache
-    print(f"Sprache gesetzt auf: {sprache.name}")
 
-# Callback-Funktion für den "Bestätigen"-Button
-def on_code_bestaetigt(code: Code):
-    global spieloberflaeche_frame, spielcode
-    set_code(code)
 
-    if spieleinstellungen_frame:
-        spieleinstellungen_frame.pack_forget()
+def set_algorithm(algorithm: str):
+    global spielAlgorithmus
+    spielAlgorithmus = algorithm
 
-    if spieloberflaeche_frame:
-        spieloberflaeche_frame.destroy()
-
-    # Übergabe der spielVariante an create_spieloberfläche
-    spieloberflaeche_frame = create_spieloberfläche(root, spielVariante)
-    spieloberflaeche_frame.pack(fill="both", expand=True)
 
 def set_code(code: Code):
     global spielcode
     spielcode = code
-    print(f"aktueller Code ist : {code.farben}")
 
-def show_spieleinstellungen():
-    global spieleinstellungen_frame, uebersicht_frame
-    print(f"DEBUG: Aktuelle Variante: {spielVariante}, Steckplätze: {spielVariante.steckplaetze}")
-    if uebersicht_frame:
-        uebersicht_frame.pack_forget()
-    # Frame NEU erstellen (auch wenn er schon existiert)
-    if spieleinstellungen_frame:
-        spieleinstellungen_frame.destroy()  # Alten Frame löschen
-    spieleinstellungen_frame = create_spieleinstellungen_superhirn_frame(
-        root,
-        show_uebersicht,
-        on_code_bestaetigt,
-        spielVariante.steckplaetze,                                         # Anzahl an Steckplätze werden übergeben
-        spielVariante,
-        spielModus,
-        spielSprache
-    )
-    spieleinstellungen_frame.pack(fill="both", expand=True)
 
+def set_zeit(zeit: int):
+    global spielZeit
+    spielZeit = zeit
+
+
+# --- Frame-Wechsel-Funktionen ---
 def show_uebersicht():
-    global spieleinstellungen_frame, uebersicht_frame
-
+    global uebersicht_frame, spieleinstellungen_frame
     if spieleinstellungen_frame:
         spieleinstellungen_frame.pack_forget()
-
     if uebersicht_frame:
         uebersicht_frame.destroy()
 
+    # Dynamischer Import (vermeidet zirkuläre Abhängigkeit)
+    from Uebersichtsbildschirm import create_uebersicht_frame
     uebersicht_frame = create_uebersicht_frame(
         root,
         show_spieleinstellungen,
@@ -99,10 +72,81 @@ def show_uebersicht():
         set_modus,
         set_sprache,
         spielSprache
-        )
+    )
     uebersicht_frame.pack(fill="both", expand=True)
 
-# Starte mit der Übersicht
-show_uebersicht()
+def show_spieleinstellungen():
+    global spieleinstellungen_frame, uebersicht_frame
 
+    # Prüfe, ob root noch existiert
+    if not root.winfo_exists():
+        print("Fehler: Hauptfenster wurde zerstört!")
+        return
+
+    if uebersicht_frame:
+        uebersicht_frame.pack_forget()
+
+    # Dynamischer Import
+    from Spieleinstellungen import create_spieleinstellungen_superhirn_frame
+
+    if spieleinstellungen_frame:
+        spieleinstellungen_frame.destroy()
+
+    # Erstelle das neue Frame
+    spieleinstellungen_frame = create_spieleinstellungen_superhirn_frame(
+        root,
+        show_uebersicht,
+        on_code_spiel_start,
+        set_algorithm,
+        spielVariante.steckplaetze,
+        spielVariante,
+        spielModus,
+        spielSprache
+    )
+    spieleinstellungen_frame.pack(fill="both", expand=True)
+
+# --- Haupt-Callback für Spielstart ---
+def on_code_spiel_start(code: Code, zeit: int):
+    global spieloberflaeche_frame
+
+
+    spielparameter = Spielparameter(
+        variante=spielVariante,
+        modus=spielModus,
+        algorithmus=spielAlgorithmus,
+        delay=zeit,
+        sprache=spielSprache,
+        code=code
+    )
+
+    # Debug-Ausgabe
+    print("\n--- Spielparameter ---")
+    print(f"Variante: {spielparameter.variante.name}")
+    print(f"Modus: {spielparameter.modus.name}")
+    print(f"Algorithmus: {spielparameter.algorithmus}")
+    print(f"Verzögerung: {spielparameter.delay} Sekunden")
+    print(f"Sprache: {spielparameter.sprache.name}")
+    print(f"Code: {[f.name for f in spielparameter.code.farben]}")
+
+    # Globale Variablen aktualisieren
+    set_code(code)
+    set_zeit(zeit)
+
+
+    if spieleinstellungen_frame:
+        spieleinstellungen_frame.pack_forget()
+
+
+    from spieloberfläche import create_spieloberfläche
+    if spieloberflaeche_frame:
+        spieloberflaeche_frame.destroy()
+
+
+    spieloberflaeche_frame = create_spieloberfläche(
+        root,
+        spielVariante,
+    )
+    spieloberflaeche_frame.pack(fill="both", expand=True)
+
+show_uebersicht()
 root.mainloop()

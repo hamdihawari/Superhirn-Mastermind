@@ -12,8 +12,8 @@ class Sprache(Enum):
         "farbauswahl": "Farbauswahl:",
         "algorithmus_auswaehlen": "Algorithmus auswählen:",
         "zeitverzoegerung": "Zeitverzögerung der Maschine in Sekunden:",
-        "zurueck": "Zurück"
-       #ä "starten": "Starten"
+        "zurueck": "Zurück",
+        "starten": "Spiel starten"
     }
 
     ENGLISCH = {
@@ -27,7 +27,8 @@ class Sprache(Enum):
         "farbauswahl": "Color selection:",
         "algorithmus_auswaehlen": "Select algorithm:",
         "zeitverzoegerung": "Machine delay in seconds:",
-        "zurueck": "Back"
+        "zurueck": "Back",
+        "starten": "Game start"
     }
 
     def __init__(self, translations):
@@ -88,3 +89,6 @@ class Sprache(Enum):
     @property
     def zurueck(self):
         return self._translations["zurueck"]
+    @property
+    def starten(self):
+        return self._translations["starten"]
