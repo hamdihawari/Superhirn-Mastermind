@@ -5,7 +5,8 @@ from src.communication.game_message import GameMessage
 
 @pytest.fixture
 def startMessage()-> GameMessage:
-    message = GameMessage(0, "",4,  6, "")
+    #message = GameMessage(0, "",4,  6, "")
+    message = {"gameid": 14100827, "gamerid": "", "positions": 4, "colors": 6, "value": "2345"}
     return message
 
 @pytest.fixture
@@ -33,9 +34,9 @@ def test_jsonDeserializer(jsonMessage, startMessage):
     print (jsonMessage)
     assert gameMessage == startMessage
 
-def test_handshake_superhirn(jsonMessage):
+def test_handshake_superhirn(startMessage):
     response = requests.post(
-        "http://localhost:5000/", json = jsonMessage)
+        "http://141.45.34.161:5001/", json = startMessage)
 
 
     print (response.status_code)
@@ -43,7 +44,7 @@ def test_handshake_superhirn(jsonMessage):
 
 
 def test_handshake_super_superhirn(super_superhirn_message):
-    response = requests.post("http://localhost:5000/game", json = super_superhirn_message)
+    response = requests.post("http://141.45.34.161:5001/", json = super_superhirn_message)
 
     print(response.status_code)
     print(response.json())
