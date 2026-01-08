@@ -1,36 +1,46 @@
 import pytest
 
-from src.spiel.strategie.player import Player
+from src.anwendung.modus import Modus
+from src.anwendung.spielparameter import Spielparameter
 from src.spiel.variante import Variante
 from src.spiel.spielCodes import Code
 from src.spiel.farbe import Farbe
 from src.spiel.game import Game
-from unittest.mock import Mock
+from unittest.mock import patch
 
 
 @pytest.fixture
 def geheim_code():
     return Code([Farbe.ORANGE, Farbe.GELB, Farbe.GELB, Farbe.ROT])
 
-
 @pytest.fixture
-def codierer():
-    return Mock(spec=Player)
-
-@pytest.fixture
-def rater():
-    return Mock(spec=Player)
-
+def geheim_code2():
+    return Code([Farbe.ROT, Farbe.GELB, Farbe.GELB, Farbe.ORANGE,Farbe.SCHWARZ])
 
 
 @pytest.fixture
-def game(geheim_code, codierer, rater):
-    return Game(
-        codierer=codierer,
-        rater=rater,
-        variante=Variante.SUPER,
-        secret_code=geheim_code
-    )
+def parameter():
+    return Spielparameter(Variante.SUPER, Modus.C_M,"knuth",1,None)
+
+@pytest.fixture
+def parameter2():
+    return Spielparameter(Variante.SUPERSUPER, Modus.C_M,"knuth",1,None)
+
+
+@pytest.fixture
+def game(parameter,geheim_code):
+    # Mocke die Methode während der Game-Initialisierung
+    with patch('src.spiel.strategie.playerType.ComputerPlayer.generiereGeheimeCode',
+               return_value=geheim_code):
+        return Game(parameter)
+
+
+@pytest.fixture
+def game2(parameter2,geheim_code2):
+    # Mocke die Methode während der Game-Initialisierung
+    with patch('src.spiel.strategie.playerType.ComputerPlayer.generiereGeheimeCode',
+               return_value=geheim_code2):
+        return Game(parameter2)
 
 
 def test_game_startzustand(game):
@@ -46,6 +56,12 @@ def test_feedback_alle_schwarz(game):
     assert feedback.schwarz == 4
     assert feedback.weiss == 0
 
+def test_feedback_alle_schwarz2(game2):
+    rate = Code([Farbe.ROT, Farbe.GELB, Farbe.GELB, Farbe.ORANGE,Farbe.SCHWARZ])
+    feedback = game2.fuehreRateversuchDurch(rate)
+
+    assert feedback.schwarz == 5
+    assert feedback.weiss == 0
 
 def test_feedback_alle_weiss(game):
     rate = Code([Farbe.GELB, Farbe.ROT, Farbe.ORANGE, Farbe.GELB])
