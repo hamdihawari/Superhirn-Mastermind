@@ -8,7 +8,7 @@ from src.spiel.spielCodes import Code
 
 class EngineInt(ABC):
 
-    def fuehreZugAus(self,Code)->Feedback:
+    def fuehreZugAus(self,code:Code)->Feedback:
         pass
 
     def istFertig(self)->bool:
@@ -20,7 +20,7 @@ class SpielEngine(EngineInt):
         self.spiel = Game(param)
         self.modus = param.modus
         self.com = ComPort()
-        if param.modus == Modus.C_M_ONLINE or self.modus == Modus.C_C_ONLINE:
+        if param.modus.online:
             self.com.starte(param.variante)
 
     def fuehreZugAus(self,code:Code)->Feedback:
