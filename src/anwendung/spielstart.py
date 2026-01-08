@@ -19,9 +19,9 @@ class StarterInt(ABC):
 
 class Spielstarter(ABC):
 
-    def starteSpiel(param:Spielparameter) -> SpielEngine:
+    def starteSpiel(self,param:Spielparameter) -> SpielEngine:
         return SpielEngine(param)
 
-    def starteParallel(param:Spielparameter,param2:Spielparameter) -> list[SpielEngine]:
+    def starteParallel(self,param:Spielparameter,param2:Spielparameter) -> list[SpielEngine]:
         return [SpielEngine(param),SpielEngine(param2)]
 

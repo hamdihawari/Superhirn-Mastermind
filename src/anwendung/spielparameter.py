@@ -1,9 +1,6 @@
-from enum import Enum
-
 from src.anwendung.modus import Modus
 from src.spiel.spielCodes import Code
 from src.spiel.variante import Variante
-from src.ui.sprache import Sprache
 
 
 class Spielparameter:

@@ -1,6 +1,6 @@
 from abc import ABC
 from src.anwendung.spielparameter import Spielparameter, Modus
-# from src.kommunikation.comPort import ComPort
+from src.kommunikation.comPort import ComPort
 from src.spiel.game import Game
 from src.spiel.spielCodes import Feedback
 from src.spiel.spielCodes import Code
@@ -19,7 +19,7 @@ class SpielEngine(EngineInt):
     def __init__(self,param:Spielparameter):
         self.spiel = Game(param)
         self.modus = param.modus
-       # self.com = ComPort()
+        self.com = ComPort()
         if param.modus.online:
             self.com.starte(param.variante)
 
@@ -30,3 +30,5 @@ class SpielEngine(EngineInt):
 
     def istFertig(self)->bool:
         return self.spiel.istFertig()
+
+

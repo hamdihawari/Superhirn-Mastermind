@@ -1,9 +1,13 @@
 from enum import Enum
 
 class Modus(Enum):
-    """Einfache Enum für die Spielmodus-Auswahl (ohne UI-Logik)"""
-    M_C = "Mensch-Computer"
-    C_M = "Computer-Mensch"
-    C_C = "Computer-Computer"
-    C_M_ONLINE = "Computer-Mensch(On)"
-    C_C_ONLINE = "Computer-Computer(On)"
+    M_C=("mensch","computer",False)
+    C_M=("computer","mensch",False)
+    C_C=("computer","computer",False)
+    C_M_ONLINE=("computer_online","mensch",True)
+    C_C_ONLINE=("computer_online","computer",True)
+
+    def __init__(self,codierer,rater,online:bool):
+        self.codierer=codierer
+        self.rater = rater
+        self.online=online
