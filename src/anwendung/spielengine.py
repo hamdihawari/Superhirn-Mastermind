@@ -8,7 +8,7 @@ from src.spiel.spielCodes import Code
 
 class EngineInt(ABC):
 
-    def fuehreZugAus(self,Code)->Feedback:
+    def fuehreZugAus(self,code:Code)->Feedback:
         pass
 
     def istFertig(self)->bool:
@@ -17,15 +17,16 @@ class EngineInt(ABC):
 class SpielEngine(EngineInt):
 
     def __init__(self,param:Spielparameter):
-        self.spiel = Game(param.variante,param.modus,param.code,param.algorithmus)
+        self.spiel = Game(param)
         self.modus = param.modus
-        # self.com = ComPort()
-        if param.modus == Modus.C_M_ONLINE or self.modus == Modus.C_C_ONLINE:
-            self.com.starte()
+       # self.com = ComPort()
+        if param.modus.online:
+            self.com.starte(param.variante)
 
     def fuehreZugAus(self,code:Code)->Feedback:
         if self.modus == Modus.C_M_ONLINE  or self.modus == Modus.C_C_ONLINE:
             return self.com.sendeVersuch(code)
-        self.spiel.fuehreRateversuchDurch(code)
+        return self.spiel.fuehreRateversuchDurch(code)
 
-
+    def istFertig(self)->bool:
+        return self.spiel.istFertig()
