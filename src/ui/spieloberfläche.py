@@ -1,79 +1,93 @@
 import tkinter as tk
-from tkinter import Canvas, StringVar, OptionMenu
+from typing import List, Callable
+from tkinter import Canvas
+from src.anwendung.spielparameter import Spielparameter
+from src.spiel.variante import Farbe
 
-def create_spieloberfläche(root, spielparameter):
+def create_spieloberfläche(
+    root,
+    spielparameter: Spielparameter,
+    on_rateversuch_erhalten: Callable  # Einziger Callback: Sendet Versuch an Controller
+):
+    # Hauptframe
     frame = tk.Frame(root, bg="#D2B48C")
     frame.pack(fill="both", expand=True, padx=10, pady=10)
 
-    # Canvas für das Spielfeld
+    # --- Spielfeld (links) ---
     canvas = Canvas(frame, width=375, height=500, bg="#8B4513", bd=0, highlightthickness=0)
     canvas.pack(side="left", padx=10, pady=20)
 
-    # Farben aus der Variante extrahieren
+    # --- Steuerung (rechts) ---
+    steuerungs_frame = tk.Frame(frame, bg="#D2B48C")
+    steuerungs_frame.pack(side="right", fill="y", padx=10, pady=10)
+
+    # Farben und Zuordnung
     farben = [farbe.name for farbe in spielparameter.variante.erlaubteFarben]
     farb_zuordnung = {
         "ROT": "red", "GRUEN": "green", "BLAU": "blue", "GELB": "yellow",
         "ORANGE": "orange", "BRAUN": "brown", "WEISS": "white", "SCHWARZ": "black"
     }
+    farb_rückzuordnung = {v: k for k, v in farb_zuordnung.items()}
 
+    # Aktuelle Zeile und Steine verwalten
+    aktuelle_zeile = 0
+    alle_zeilen = []
+
+    # 10 Zeilen für das Spiel erstellen
+    for zeile in range(10):
+        steine = []
+        for spalte in range(spielparameter.variante.steckplaetze):
+            x = 50 + spalte * 50
+            y = 50 + zeile * 40
+            kreis = canvas.create_oval(x, y, x + 30, y + 30, fill="white", outline="black")
+            steine.append(kreis)
+        alle_zeilen.append({"steine": steine})
+
+    # --- Dropdown und Button untereinander ---
     # Dropdown für Farbauswahl
-    farbauswahl_var = StringVar(frame)
-    farbauswahl_var.set(farben[0])  # Standardfarbe
-
-    dropdown_frame = tk.Frame(frame, bg="#D2B48C")
-    dropdown_frame.pack(pady=5)
-    tk.Label(dropdown_frame, text="Aktuelle Farbe:", bg="#D2B48C").pack(side=tk.LEFT)
-    dropdown = OptionMenu(dropdown_frame, farbauswahl_var, *farben)
+    farbauswahl_var = tk.StringVar(steuerungs_frame)
+    farbauswahl_var.set(farben[0])
+    dropdown = tk.OptionMenu(steuerungs_frame, farbauswahl_var, *farben)
     dropdown.config(bg="#D2B48C")
-    dropdown.pack(side=tk.LEFT, padx=5)
+    dropdown.pack(pady=5)
 
-    # NUR DIE ERSTE ZEILE wird bearbeitbar gemacht
-    steine = {}
+    # Stein-Auswahl-Buttons (horizontal)
+    stein_buttons_frame = tk.Frame(steuerungs_frame, bg="#D2B48C")
+    stein_buttons_frame.pack(pady=5)
+
+    def setze_farbe(spalte):
+        farbe_name = farbauswahl_var.get()
+        farbe_hex = farb_zuordnung[farbe_name]
+        canvas.itemconfig(alle_zeilen[aktuelle_zeile]["steine"][spalte], fill=farbe_hex)
+
     for spalte in range(spielparameter.variante.steckplaetze):
-        id = canvas.create_oval(
-            30 + spalte * 40,
-            80,  # Nur erste Zeile (Y-Position fest)
-            50 + spalte * 40,
-            100,
-            fill="gray50",
-            outline="black",
-            tags=f"stein_0_{spalte}"  # Zeile 0
-        )
-        steine[spalte] = id  # Speichere nur die erste Zeile
-        canvas.tag_bind(id, "<Button-1>",
-                      lambda e, s=spalte, f=farbauswahl_var, c=canvas, st=steine:
-                          setze_stein(c, s, farb_zuordnung[f.get()], st))
+        tk.Button(
+            stein_buttons_frame,
+            text=f"Stein {spalte + 1}",
+            command=lambda s=spalte: setze_farbe(s),
+            bg="#8B4513", fg="white"
+        ).pack(side="left", padx=2)
 
-    # Bewertungskreise (leer, da noch nicht bewertet)
-    for i in range(4):  # 4 Bewertungsfelder (2 schwarze, 2 weiße)
-        canvas.create_oval(
-            190 + (i % 2) * 20, 85 + (i // 2) * 15,
-            200 + (i % 2) * 20, 95 + (i // 2) * 15,
-            fill="gray80", outline="black"
-        )
-
-    # Button zum Ausgeben der Farbkombination im Terminal
-    def ausgabe_im_terminal():
+    # --- Bestätigungsbutton (unter dem Dropdown) ---
+    def bestätige_rateversuch():
+        nonlocal aktuelle_zeile
         versuch = []
         for spalte in range(spielparameter.variante.steckplaetze):
-            farbe = canvas.itemcget(steine[spalte], "fill")
-            # Umkehrung der farb_zuordnung für die Ausgabe (z. B. "red" → "ROT")
-            farbe_name = [k for k, v in farb_zuordnung.items() if v == farbe][0]
+            farbe_hex = canvas.itemcget(alle_zeilen[aktuelle_zeile]["steine"][spalte], "fill")
+            farbe_name = farb_rückzuordnung.get(farbe_hex, "WEISS")
             versuch.append(farbe_name)
-        print("\n--- Rateversuch (Zeile 1) ---")
-        print(f"Farbkombination: {versuch}")
 
-    def setze_stein(canvas, spalte, farbe, steine):
-        canvas.itemconfig(steine[spalte], fill=farbe)
+        on_rateversuch_erhalten(versuch, aktuelle_zeile)
 
-    ausgabe_button = tk.Button(
-        frame,
-        text="Kombination ausgeben",
-        command=ausgabe_im_terminal,
-        bg="#8B4513",
-        fg="white",
+        if aktuelle_zeile < 9:
+            aktuelle_zeile += 1
+
+    tk.Button(
+        steuerungs_frame,
+        text="Rateversuch bestätigen",
+        command=bestätige_rateversuch,
+        bg="#4CAF50", fg="white",
         font=("Arial", 12, "bold")
-    )
-    ausgabe_button.pack(pady=10)
+    ).pack(pady=10)
 
     return frame

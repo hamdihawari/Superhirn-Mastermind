@@ -1,4 +1,6 @@
 import tkinter as tk
+from typing import List
+
 from src.anwendung.modus import Modus
 from src.anwendung.spielparameter import Spielparameter
 from src.spiel.variante import Variante
@@ -8,7 +10,7 @@ from src.spiel.spielCodes import Code
 # Hauptfenster
 root = tk.Tk()
 root.title("Superhirn")
-root.geometry("600x550")
+root.geometry("700x600")
 root.resizable(False, False)
 
 # Globale Variablen für die Frames
@@ -109,42 +111,37 @@ def show_spieleinstellungen():
 def on_code_spiel_start(code: Code, zeit: int):
     global spieloberflaeche_frame
 
-    # Algorithmus wird auf None gesetzt wenn dieser nicht Maschine gegen Computer ist
-    algorithmus = spielAlgorithmus if spielModus == Modus.M_C else None
-
     spielparameter = Spielparameter(
         variante=spielVariante,
         modus=spielModus,
-        algorithmus=algorithmus,
+        algorithmus=spielAlgorithmus if spielModus == Modus.M_C else None,
         delay=zeit,
         code=code
     )
 
-    # Debug-Ausgabe
-    print("\n--- Spielparameter ---")
-    print(f"Variante: {spielparameter.variante.name}")
-    print(f"Modus: {spielparameter.modus.name}")
-    print(f"Algorithmus: {spielparameter.algorithmus}")
-    print(f"Verzögerung: {spielparameter.delay} Sekunden")
-    print(f"Code: {[f.name for f in spielparameter.code.farben]}")
+    # Einziger Callback: Empfängt den Rateversuch vom GUI
+    def on_rateversuch_erhalten(versuch: List[str], zeile: int):
+        """Wird aufgerufen, wenn der Spieler einen Versuch bestätigt.
+        Args:
+            versuch: Liste der Farben (z. B. ["ROT", "GRUEN", "BLAU", "GELB"])
+            zeile: Aktuelle Zeile (0-9)
+        """
+        print(f"\n--- Rateversuch (Zeile {zeile + 1}) ---")
+        print(f"Empfangener Versuch: {versuch}")
+        # Hier könnte später die Bewertung stattfinden (aber noch nicht!)
 
-    # Globale Variablen aktualisieren
-    set_code(code)
-    set_zeit(zeit)
-
-
+    # Controller wird NICHT gebraucht (wir nutzen nur den Callback direkt)
     if spieleinstellungen_frame:
         spieleinstellungen_frame.pack_forget()
-
 
     from spieloberfläche import create_spieloberfläche
     if spieloberflaeche_frame:
         spieloberflaeche_frame.destroy()
 
-
     spieloberflaeche_frame = create_spieloberfläche(
         root,
-        spielparameter
+        spielparameter,
+        on_rateversuch_erhalten  # Einziger Callback: Übermittelt den Versuch an den Controller
     )
     spieloberflaeche_frame.pack(fill="both", expand=True)
 
