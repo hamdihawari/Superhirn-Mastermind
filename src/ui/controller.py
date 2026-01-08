@@ -120,6 +120,8 @@ def show_spieleinstellungen():
 def on_code_spiel_start(code: Code, zeit: int):
     global spieloberflaeche_frame
 
+
+
     if not isinstance(code, Code):                                              # Stelle sicher, dass der Code ein Code-Objekt ist
         code = Code([Farbe[farbe] for farbe in code])
 
@@ -142,11 +144,6 @@ def on_code_spiel_start(code: Code, zeit: int):
     # Spiel starten und Engine-Objekt erhalten
     spiel_engine = Spielstarter.starteSpiel(spielparameter)
 
-    # Für M_C: Ersten Zug ausführen
-    if spielModus == Modus.M_C:
-        erster_versuch = Code([Farbe.ROT, Farbe.ROT, Farbe.ROT, Farbe.ROT])
-        feedback = spiel_engine.fuehreZugAus(erster_versuch)
-        print(f"Erster Computer-Versuch: {feedback.schwarz} schwarz, {feedback.weiss} weiß")
 
     # Einziger Callback: Empfängt den Rateversuch vom GUI
     def on_rateversuch_erhalten(versuch: List[str], zeile: int):
