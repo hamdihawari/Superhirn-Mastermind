@@ -1,21 +1,30 @@
 import tkinter as tk
+
+from anwendung.modus import Modus
 from src.spiel.spielCodes import Code
 from src.spiel.variante import Variante, Farbe
+from ui.sichtbarkeiten import Sichtbarkeiten
+
 
 def create_spieleinstellungen_superhirn_frame(
     root,
     back_callback,
-    spielstart_callback,  # ← on_code_spiel_start wird als Parameter übergeben
+    spielstart_callback,
     set_algorithm_callback,
     anzahl_steckplaetze,
     spielVariante,
     spielmodus,
     sprache
 ):
+
+    # Sichtbarkeiten basierend auf dem Modus holen
+    sichtbarkeiten = Sichtbarkeiten.get_sichtbarkeit(spielmodus)
+    print(f"Sichtbarkeiten in create_spieleinstellungen_superhirn_frame: {sichtbarkeiten}")  # Debug-Ausgabe
+
     frame = tk.Frame(root)
     farbe_vars = []  # Speichert alle StringVars der OptionMenüs
 
-
+    # Header-Frame
     header_frame = tk.Frame(frame)
     header_frame.pack(anchor="nw", pady=10)
 
@@ -26,8 +35,8 @@ def create_spieleinstellungen_superhirn_frame(
         font=("Arial", 36, "underline")
     ).pack(side="left")
 
-    # Farbauswahl (falls spielmodus.show_farbe = True)
-    if spielmodus.show_farbe:
+    # 1. Farbauswahl (nur wenn sichtbarkeiten["show_farbe"] == True)
+    if sichtbarkeiten["show_farbe"]:
         upperCenter_frame = tk.Frame(frame, bg="green", borderwidth=5, padx=10, pady=2)
         upperCenter_frame.pack(anchor="nw", fill="x", padx=10, pady=2)
 
@@ -62,8 +71,8 @@ def create_spieleinstellungen_superhirn_frame(
             farbe_option.config(bg="white", width=15, font=("Arial", 12))
             farbe_option.pack(side="left", padx=5)
 
-    # Algorithmusauswahl (falls spielmodus.show_algorithmus = True)
-    if spielmodus.show_algorithmus:
+    # 2. Algorithmusauswahl (nur wenn sichtbarkeiten["show_algorithmus"] == True)
+    if sichtbarkeiten["show_algorithmus"]:
         center_frame = tk.Frame(frame, bg="green", borderwidth=5, padx=10, pady=2)
         center_frame.pack(anchor="nw", padx=10, pady=2, fill="x")
 
@@ -96,8 +105,8 @@ def create_spieleinstellungen_superhirn_frame(
             )
             algorithm_radiobutton.pack(side="left", padx=50, pady=2)
 
-    # Zeitverzögerung (falls spielmodus.show_zeit = True)
-    if spielmodus.show_zeit:
+    # 3. Zeitverzögerung (nur wenn sichtbarkeiten["show_zeit"] == True)
+    if sichtbarkeiten["show_zeit"]:
         lower_frame = tk.Frame(frame, bg="green", borderwidth=5, padx=10, pady=2)
         lower_frame.pack(anchor="nw", padx=10, pady=2, fill="x")
 
@@ -119,20 +128,12 @@ def create_spieleinstellungen_superhirn_frame(
         zeit_option.config(bg="white", width=15, font=("Arial", 12))
         zeit_option.pack(side="left", padx=5, pady=2)
 
+    # 4. Code-Auswahl (nur wenn sichtbarkeiten["show_code_auswahl"] == True)
+    if sichtbarkeiten["show_code_auswahl"]:
+        # Hier würde der Code für die Code-Auswahl kommen
+        pass
 
-    def on_spiel_start():
-        # 1. Farbauswahl (immer vorhanden, wenn show_farbe=True)
-        ausgewählte_farben = [farbe_var.get() for farbe_var in farbe_vars]
-        code = Code(farben=[Farbe[farbe] for farbe in ausgewählte_farben])
-
-        # 2. Zeitauswahl (nur abfragen, wenn show_zeit=True)
-        ausgewählte_zeit = 0  # Standardwert, falls keine Zeitauswahl existiert
-        if spielmodus.show_zeit:
-            ausgewählte_zeit = int(zeit_var.get())  # Nur abfragen, wenn zeit_var existiert
-
-        # 3. Spiel starten
-        spielstart_callback(code, ausgewählte_zeit)
-
+    # Start- und Zurück-Buttons (immer sichtbar)
     zurückButton_Spieleinstellungen = tk.Button(
         header_frame,
         text=sprache.zurueck,
@@ -144,6 +145,21 @@ def create_spieleinstellungen_superhirn_frame(
         pady=2,
     )
     zurückButton_Spieleinstellungen.pack(side="left", padx=20, pady=2)
+
+    def on_spiel_start():
+        # 1. Farbauswahl (nur wenn show_farbe=True)
+        code = None
+        if sichtbarkeiten["show_farbe"]:
+            ausgewählte_farben = [farbe_var.get() for farbe_var in farbe_vars]
+            code = Code(farben=[Farbe[farbe] for farbe in ausgewählte_farben])
+
+        # 2. Zeitauswahl (nur wenn show_zeit=True)
+        ausgewählte_zeit = 0
+        if sichtbarkeiten["show_zeit"]:
+            ausgewählte_zeit = int(zeit_var.get())
+
+        # 3. Spiel starten
+        spielstart_callback(code, ausgewählte_zeit)
 
     bestätigenButton = tk.Button(
         header_frame,

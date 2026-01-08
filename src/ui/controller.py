@@ -1,11 +1,15 @@
 import tkinter as tk
 from typing import List
 
-from src.anwendung.modus import Modus
+from anwendung import spielengine, spielstart
+from anwendung.spielstart import Spielstarter
+from spiel.farbe import Farbe
+from anwendung.modus import Modus
 from src.anwendung.spielparameter import Spielparameter
 from src.spiel.variante import Variante
 from src.ui.sprache import Sprache
 from src.spiel.spielCodes import Code
+from ui.sichtbarkeiten import Sichtbarkeiten
 
 # Hauptfenster
 root = tk.Tk()
@@ -26,6 +30,8 @@ spielSprache = Sprache.DEUTSCH
 spielcode = None
 spielZeit = None
 
+
+
 # --- Funktionen zum Setzen der Parameter ---
 def set_variante(variante: Variante):
     global spielVariante
@@ -33,9 +39,9 @@ def set_variante(variante: Variante):
 
 
 def set_modus(modus: Modus):
-    global spielModus
+    global spielModus, spieleinstellungen_frame
     spielModus = modus
-
+    print(f"Modus geändert auf: {modus}")
 
 def set_sprache(sprache: Sprache):
     global spielSprache
@@ -80,20 +86,18 @@ def show_uebersicht():
 def show_spieleinstellungen():
     global spieleinstellungen_frame, uebersicht_frame
 
-    # Prüfe, ob root noch existiert
-    if not root.winfo_exists():
-        print("Fehler: Hauptfenster wurde zerstört!")
-        return
 
     if uebersicht_frame:
         uebersicht_frame.pack_forget()
 
-    # Dynamischer Import
-    from Spieleinstellungen import create_spieleinstellungen_superhirn_frame
-
     if spieleinstellungen_frame:
         spieleinstellungen_frame.destroy()
 
+    print(f"Aktueller Modus: {spielModus}")  # Debug-Ausgabe
+    sichtbarkeiten = Sichtbarkeiten.get_sichtbarkeit(spielModus)
+    print(f"Sichtbarkeiten: {sichtbarkeiten}")  # Debug-Ausgabe
+
+    from Spieleinstellungen import create_spieleinstellungen_superhirn_frame
     # Erstelle das neue Frame
     spieleinstellungen_frame = create_spieleinstellungen_superhirn_frame(
         root,
@@ -108,8 +112,16 @@ def show_spieleinstellungen():
     spieleinstellungen_frame.pack(fill="both", expand=True)
 
 # --- Haupt-Callback für Spielstart ---
+"""
+    beim ausführen von spiel Starten Button soll 
+    1. Spieloberfläche erzeugt werden und Spielstart erzeugt werden -> danach wird ein EngineInt zurückgegeben
+
+"""
 def on_code_spiel_start(code: Code, zeit: int):
     global spieloberflaeche_frame
+
+    if not isinstance(code, Code):                                              # Stelle sicher, dass der Code ein Code-Objekt ist
+        code = Code([Farbe[farbe] for farbe in code])
 
     spielparameter = Spielparameter(
         variante=spielVariante,
@@ -118,6 +130,23 @@ def on_code_spiel_start(code: Code, zeit: int):
         delay=zeit,
         code=code
     )
+
+    # Debug-Ausgabe
+    print("\n--- Spielparameter ---")
+    print(f"Variante: {spielparameter.variante.name}")
+    print(f"Modus: {spielparameter.modus.name}")
+    print(f"Algorithmus: {spielparameter.algorithmus}")
+    print(f"Verzögerung: {spielparameter.delay} Sekunden")
+    print(f"Code: {[f.name for f in spielparameter.code.farben]}")
+
+    # Spiel starten und Engine-Objekt erhalten
+    spiel_engine = Spielstarter.starteSpiel(spielparameter)
+
+    # Für M_C: Ersten Zug ausführen
+    if spielModus == Modus.M_C:
+        erster_versuch = Code([Farbe.ROT, Farbe.ROT, Farbe.ROT, Farbe.ROT])
+        feedback = spiel_engine.fuehreZugAus(erster_versuch)
+        print(f"Erster Computer-Versuch: {feedback.schwarz} schwarz, {feedback.weiss} weiß")
 
     # Einziger Callback: Empfängt den Rateversuch vom GUI
     def on_rateversuch_erhalten(versuch: List[str], zeile: int):
@@ -129,6 +158,13 @@ def on_code_spiel_start(code: Code, zeit: int):
         print(f"\n--- Rateversuch (Zeile {zeile + 1}) ---")
         print(f"Empfangener Versuch: {versuch}")
         # Hier könnte später die Bewertung stattfinden (aber noch nicht!)
+
+        # Konvertiere String-Liste zu Farbe-Objekten
+        farb_versuch = Code([Farbe[farbe] for farbe in versuch])
+
+        # Führe den Versuch aus
+        feedback = spiel_engine.fuehreZugAus(farb_versuch)
+        print(f"Feedback: {feedback.schwarz} schwarz, {feedback.weiss} weiß")
 
     # Controller wird NICHT gebraucht (wir nutzen nur den Callback direkt)
     if spieleinstellungen_frame:

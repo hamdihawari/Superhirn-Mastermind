@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from src.anwendung.modus import Modus
+from anwendung.modus import Modus
 from src.spiel.variante import Variante
 from src.ui.sprache import Sprache
 
@@ -104,33 +104,49 @@ def create_uebersicht_frame(root, next_callback, set_variante_callback, set_modu
     )
     ueberschrift_Modus.pack(anchor="w", padx=10)
 
-    modus_namen = {                                                             # Mapping von den Anzeigenamen zu Modus-Enum
-        Modus.M_C: Modus.M_C.description,
-        Modus.C_M: Modus.C_M.description,
-        Modus.C_C: Modus.C_C.description,
-        Modus.M_C_ONLINE: Modus.M_C_ONLINE.description,
-        Modus.C_C_ONLINE: Modus.C_C_ONLINE.description
+    # Frame für die Radiobuttons mit Grid-Layout
+    modus_radio_frame = tk.Frame(center_frame_Modus, bg="green")
+    modus_radio_frame.pack(fill="x", pady=5)
+
+    modus_namen = {
+        Modus.M_C: "Mensch-Computer",
+        Modus.C_M: "Computer-Mensch",
+        Modus.C_C: "Computer-Computer",
+        Modus.C_M_ONLINE: "Computer-Mensch(On)",
+        Modus.C_C_ONLINE: "Computer-Computer(On)"
     }
 
-    modus_auswahl = tk.StringVar(value=Modus.M_C.description)                   # Standard ist Mensch der Codierer
+    modus_auswahl = tk.StringVar(value="Mensch-Computer")  # Standardwert
 
     def on_modus_change(*args):
-        name_to_enum = {v: k for k, v in modus_namen.items()}
-        selected_enum = name_to_enum[modus_auswahl.get()]                       # Ausgewählten Namen aus modus_auswahl holen --> modus_auswahl.get() → Gibt den aktuell ausgewählten Anzeigenamen zurück (z. B. "Rater (C-M)").
+        namen_modi = {v: k for k, v in modus_namen.items()}
+        selected_enum = namen_modi[modus_auswahl.get()]
         set_modus_callback(selected_enum)
 
-    modus_auswahl.trace_add("write", on_modus_change)                         # beobachtet nur Änderungen und ruft die Callback-Funktion auf
+    modus_auswahl.trace_add("write", on_modus_change)
 
-    for modus_enum, anzeige_name in modus_namen.items():
+    # Radiobuttons in 3 Spalten anordnen für bessere Platzausnutzung
+    for i, (modus, anzeige_name) in enumerate(modus_namen.items()):
+        row = i // 3  # 3 Spalten
+        col = i % 3
+
         radiobutton = tk.Radiobutton(
-            center_frame_Modus,
+            modus_radio_frame,
             text=anzeige_name,
             variable=modus_auswahl,
             value=anzeige_name,
-            font=("Arial", 14),
-            bg="green"
+            font=("Arial", 12),
+            bg="green",
+            width=18,
+            anchor="w"
         )
-        radiobutton.pack(side="left", padx=5, pady=10)
+        radiobutton.grid(
+            row=row,
+            column=col,
+            padx=10,
+            pady=5,
+            sticky="w"
+        )
 
 
     # ------------------------ Modus-Auswahl  ------------------------------
@@ -179,7 +195,7 @@ def create_uebersicht_frame(root, next_callback, set_variante_callback, set_modu
     end_frame.pack(fill="x", padx=10, pady=2)
 
     bestaetigenButton = tk.Button(
-        end_frame,
+        header_frame,
         text=sprache.bestaetigen,  # Dynamischer Text
         command=next_callback,
         font=("Arial", 14, "bold"),
