@@ -1,0 +1,188 @@
+import tkinter as tk
+from typing import List
+
+from anwendung import spielengine, spielstart
+from anwendung.spielstart import Spielstarter
+from spiel.farbe import Farbe
+from anwendung.modus import Modus
+from src.anwendung.spielparameter import Spielparameter
+from src.spiel.variante import Variante
+from src.ui.sprache import Sprache
+from src.spiel.spielCodes import Code
+from ui.sichtbarkeiten import Sichtbarkeiten
+
+# Hauptfenster
+root = tk.Tk()
+root.title("Superhirn")
+root.geometry("700x600")
+root.resizable(False, False)
+
+# Globale Variablen für die Frames
+uebersicht_frame = None
+spieleinstellungen_frame = None
+spieloberflaeche_frame = None
+
+# Standardwerte
+spielVariante = Variante.SUPER
+spielModus = Modus.M_C
+spielAlgorithmus = "Knuth"
+spielSprache = Sprache.DEUTSCH
+spielcode = None
+spielZeit = None
+
+# --- Funktionen zum Setzen der Parameter ---
+def set_variante(variante: Variante):
+    global spielVariante
+    spielVariante = variante
+
+def set_modus(modus: Modus):
+    global spielModus, spieleinstellungen_frame
+    spielModus = modus
+    # print(f"Modus geändert auf: {modus}")                         # Debug
+
+def set_sprache(sprache: Sprache):
+    global spielSprache
+    spielSprache = sprache
+
+def set_algorithm(algorithm: str):
+    global spielAlgorithmus
+    spielAlgorithmus = algorithm
+
+def set_code(code: Code):
+    global spielcode
+    spielcode = code
+
+def set_zeit(zeit: int):
+    global spielZeit
+    spielZeit = zeit
+
+# --- Frame-Wechsel-Funktionen ---
+def show_uebersicht():
+    global uebersicht_frame, spieleinstellungen_frame
+    if spieleinstellungen_frame:
+        spieleinstellungen_frame.pack_forget()
+    if uebersicht_frame:
+        uebersicht_frame.destroy()
+
+    # Dynamischer Import (vermeidet zirkuläre Abhängigkeit)
+    from Uebersichtsbildschirm import create_uebersicht_frame
+    uebersicht_frame = create_uebersicht_frame(
+        root,
+        show_spieleinstellungen,
+        set_variante,
+        set_modus,
+        set_sprache,
+        spielSprache
+    )
+    uebersicht_frame.pack(fill="both", expand=True)
+
+def show_spieleinstellungen():
+    global spieleinstellungen_frame, uebersicht_frame
+
+    if uebersicht_frame:
+        uebersicht_frame.pack_forget()
+
+    if spieleinstellungen_frame:
+        spieleinstellungen_frame.destroy()
+
+    print(f"Aktueller Modus: {spielModus}")  # Debug-Ausgabe
+    sichtbarkeiten = Sichtbarkeiten.get_sichtbarkeit(spielModus)
+    print(f"Sichtbarkeiten: {sichtbarkeiten}")  # Debug-Ausgabe
+
+    from Spieleinstellungen import create_spieleinstellungen_superhirn_frame
+    # Erstelle das neue Frame
+    spieleinstellungen_frame = create_spieleinstellungen_superhirn_frame(
+        root,
+        show_uebersicht,
+        on_code_spiel_start,
+        set_algorithm,
+        spielVariante.steckplaetze,
+        spielVariante,
+        spielModus,
+        spielSprache
+    )
+    spieleinstellungen_frame.pack(fill="both", expand=True)
+
+# --- Haupt-Callback für Spielstart ---
+"""
+    beim ausführen von spiel Starten Button soll 
+    1. Spieloberfläche erzeugt werden und Spielstart erzeugt werden -> danach wird ein EngineInt zurückgegeben
+
+"""
+def on_code_spiel_start(code: Code, zeit: int):
+    global spieloberflaeche_frame
+
+    print(f" der Code ist gerade : {code}")
+
+    """ Fall 1: code ist None → Computer generiert einen zufälligen Code
+    if code is None:
+        code = Code.generate_random_code(spielVariante.steckplaetze, spielVariante.erlaubteFarben)
+
+        das hier müsste dann in Code Klasse :
+        @classmethod
+def generate_random_code(cls, steckplaetze: int, erlaubte_farben: List[Farbe]) -> 'Code':
+    import random
+    return Code(random.choices(erlaubte_farben, k=steckplaetze))
+    """
+
+    if code is not None and not isinstance(code, Code ):                                              # Stelle sicher, dass der Code ein Code-Objekt ist
+        code = Code([Farbe[farbe] for farbe in code])
+
+    spielparameter = Spielparameter(
+        variante=spielVariante,
+        modus=spielModus,
+        algorithmus=spielAlgorithmus if spielModus == Modus.M_C else None,
+        delay=zeit,
+        code=code
+    )
+
+    # Debug-Ausgabe
+    print("\n--- Spielparameter ---")
+    print(f"Variante: {spielparameter.variante.name}")
+    print(f"Modus: {spielparameter.modus.name}")
+    print(f"Algorithmus: {spielparameter.algorithmus}")
+    print(f"Verzögerung: {spielparameter.delay} Sekunden")
+    print(f"Code: {code}")
+
+    # Spiel starten und Engine-Objekt erhalten
+    starter = Spielstarter()
+    spiel_engine = starter.starteSpiel(spielparameter)
+
+    """
+    Einziger Callback: Empfängt den Rateversuch vom GUI
+        Wird aufgerufen, wenn der Spieler einen Versuch bestätigt.
+        Args:
+            versuch: Liste der Farben (z. B. ["ROT", "GRUEN", "BLAU", "GELB"])
+            zeile: Aktuelle Zeile (0-9)
+
+        farb_versuch wird an Spiel übergeben und feedback wird dann gespeichert 
+    """
+    def on_rateversuch_erhalten(versuch: List[str], zeile: int):
+        print(f"\n--- Rateversuch (Zeile {zeile + 1}) ---")
+        print(f"Empfangener Versuch: {versuch}")
+
+        #  Bewertung stattfinden
+        farb_versuch = Code([Farbe[farbe] for farbe in versuch])
+        print(f"der Rateversuch: {farb_versuch}")
+
+        # Führe den Versuch aus
+        feedback = spiel_engine.fuehreZugAus(farb_versuch)
+        print(f"Feedback: {feedback.schwarz} schwarz, {feedback.weiss} weiß")
+
+    # Controller wird NICHT gebraucht (wir nutzen nur den Callback direkt)
+    if spieleinstellungen_frame:
+        spieleinstellungen_frame.pack_forget()
+
+    from spieloberfläche import create_spieloberfläche
+    if spieloberflaeche_frame:
+        spieloberflaeche_frame.destroy()
+
+    spieloberflaeche_frame = create_spieloberfläche(
+        root,
+        spielparameter,
+        on_rateversuch_erhalten  # Einziger Callback: Übermittelt den Versuch an den Controller
+    )
+    spieloberflaeche_frame.pack(fill="both", expand=True)
+
+show_uebersicht()
+root.mainloop()
