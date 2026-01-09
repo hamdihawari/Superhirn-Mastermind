@@ -30,38 +30,31 @@ spielSprache = Sprache.DEUTSCH
 spielcode = None
 spielZeit = None
 
-
-
 # --- Funktionen zum Setzen der Parameter ---
 def set_variante(variante: Variante):
     global spielVariante
     spielVariante = variante
 
-
 def set_modus(modus: Modus):
     global spielModus, spieleinstellungen_frame
     spielModus = modus
-    print(f"Modus geändert auf: {modus}")
+    # print(f"Modus geändert auf: {modus}")                         # Debug
 
 def set_sprache(sprache: Sprache):
     global spielSprache
     spielSprache = sprache
 
-
 def set_algorithm(algorithm: str):
     global spielAlgorithmus
     spielAlgorithmus = algorithm
-
 
 def set_code(code: Code):
     global spielcode
     spielcode = code
 
-
 def set_zeit(zeit: int):
     global spielZeit
     spielZeit = zeit
-
 
 # --- Frame-Wechsel-Funktionen ---
 def show_uebersicht():
@@ -85,7 +78,6 @@ def show_uebersicht():
 
 def show_spieleinstellungen():
     global spieleinstellungen_frame, uebersicht_frame
-
 
     if uebersicht_frame:
         uebersicht_frame.pack_forget()
@@ -120,9 +112,20 @@ def show_spieleinstellungen():
 def on_code_spiel_start(code: Code, zeit: int):
     global spieloberflaeche_frame
 
+    print(f" der Code ist gerade : {code}")
 
+    """ Fall 1: code ist None → Computer generiert einen zufälligen Code
+    if code is None:
+        code = Code.generate_random_code(spielVariante.steckplaetze, spielVariante.erlaubteFarben)
 
-    if not isinstance(code, Code):                                              # Stelle sicher, dass der Code ein Code-Objekt ist
+        das hier müsste dann in Code Klasse :
+        @classmethod
+def generate_random_code(cls, steckplaetze: int, erlaubte_farben: List[Farbe]) -> 'Code':
+    import random
+    return Code(random.choices(erlaubte_farben, k=steckplaetze))
+    """
+
+    if code is not None and not isinstance(code, Code ):                                              # Stelle sicher, dass der Code ein Code-Objekt ist
         code = Code([Farbe[farbe] for farbe in code])
 
     spielparameter = Spielparameter(
@@ -139,25 +142,28 @@ def on_code_spiel_start(code: Code, zeit: int):
     print(f"Modus: {spielparameter.modus.name}")
     print(f"Algorithmus: {spielparameter.algorithmus}")
     print(f"Verzögerung: {spielparameter.delay} Sekunden")
-    print(f"Code: {[f.name for f in spielparameter.code.farben]}")
+    print(f"Code: {code}")
 
     # Spiel starten und Engine-Objekt erhalten
-    spiel_engine = Spielstarter.starteSpiel(spielparameter)
+    starter = Spielstarter()
+    spiel_engine = starter.starteSpiel(spielparameter)
 
-
-    # Einziger Callback: Empfängt den Rateversuch vom GUI
-    def on_rateversuch_erhalten(versuch: List[str], zeile: int):
-        """Wird aufgerufen, wenn der Spieler einen Versuch bestätigt.
+    """
+    Einziger Callback: Empfängt den Rateversuch vom GUI
+        Wird aufgerufen, wenn der Spieler einen Versuch bestätigt.
         Args:
             versuch: Liste der Farben (z. B. ["ROT", "GRUEN", "BLAU", "GELB"])
             zeile: Aktuelle Zeile (0-9)
-        """
+
+        farb_versuch wird an Spiel übergeben und feedback wird dann gespeichert 
+    """
+    def on_rateversuch_erhalten(versuch: List[str], zeile: int):
         print(f"\n--- Rateversuch (Zeile {zeile + 1}) ---")
         print(f"Empfangener Versuch: {versuch}")
-        # Hier könnte später die Bewertung stattfinden (aber noch nicht!)
 
-        # Konvertiere String-Liste zu Farbe-Objekten
+        #  Bewertung stattfinden
         farb_versuch = Code([Farbe[farbe] for farbe in versuch])
+        print(f"der Rateversuch: {farb_versuch}")
 
         # Führe den Versuch aus
         feedback = spiel_engine.fuehreZugAus(farb_versuch)

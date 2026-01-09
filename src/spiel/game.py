@@ -15,7 +15,9 @@ class Game:
         self.variante=param.variante
         if self.modus.codierer == "computer":
             self.codierer = ComputerPlayer(param.algorithmus)
-            self.secret_code=self.codierer.generiereGeheimeCode(param.variante)
+            print(f"Variante im Game Layer: {self.variante}")
+            self.secret_code=self.codierer.generiereGeheimeCode(self.variante)
+            print(f"Code im Game Layer: {self.secret_code}")
         else:
             self.codierer=HumanPlayer()
             self.secret_code=param.code
