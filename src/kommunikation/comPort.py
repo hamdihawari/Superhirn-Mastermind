@@ -26,5 +26,6 @@ class ComPort(ABC):
 
 
 class ComJson(ComPort):
+    pass
 
 
