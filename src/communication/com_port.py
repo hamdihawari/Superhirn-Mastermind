@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from src.spiel.spielCodes import Code, Feedback
 from src.anwendung.spielparameter import Modus
 from src.spiel.variante import Variante
+import requests as rq
 
 
 class ComPort(ABC):
@@ -22,4 +23,7 @@ class ComPort(ABC):
     @abstractmethod
     def send(self, code: Code) -> Feedback:
         pass
+
+
+class ComJson(ComPort):
 
