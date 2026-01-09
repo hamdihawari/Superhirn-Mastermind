@@ -27,7 +27,7 @@ class Game:
         self.erfolgreich = False
 
     def fuehreRateversuchDurch(self,code:Code) -> Feedback:
-        if self.rater == "computer":
+        if self.modus.rater == "computer":
             code=self.rater.generiereVersuch(self.runden)
         feedback = self.berechneFeedback(code)
         erfolgreich = feedback.schwarz == self.variante.steckplaetze
