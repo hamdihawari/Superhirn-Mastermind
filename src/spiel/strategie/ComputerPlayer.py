@@ -5,7 +5,7 @@ from typing import List
 
 from src.spiel.spielCodes import Code
 from src.spiel.spielrunde import SpielRunde
-from src.spiel.strategie.algoStrat import AlgorithmusStrategie
+# from src.spiel.strategie.algoStrat import AlgorithmusStrategie
 from src.spiel.strategie.player import Player
 from src.spiel.variante import Variante
 
@@ -15,7 +15,9 @@ class ComputerPlayer(Player):
         self.algorithmus = algorithmus
 
     def generiereGeheimeCode(self, variante: Variante) -> Code:
-        print(f"test")
+        print(f"generiereGeheimeCode aufgerufen mit Variante: {variante}")
+        print(f"Erlaubte Farben: {variante.erlaubteFarben}")
+        print(f"Steckplätze: {variante.steckplaetze}")
         return Code(random.choices(variante.erlaubteFarben, k=variante.steckplaetze))
 
     def generiereVersuch(self, runden: List[SpielRunde]) -> Code:
