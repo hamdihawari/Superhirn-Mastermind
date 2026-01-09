@@ -6,25 +6,43 @@ from src.spiel.spielrunde import SpielRunde
 from src.spiel.strategie.player import Player
 from typing import Optional
 
-from src.spiel.strategie.playerType import ComputerPlayer, HumanPlayer
+from src.spiel.strategie.ComputerPlayer import ComputerPlayer
+from src.spiel.strategie.MenschPlayer import MenschPlayer
 
 
 class Game:
-    def __init__(self,param:Spielparameter):
+    def __init__(self, param: Spielparameter):
         self.modus = param.modus
-        self.variante=param.variante
+        self.variante = param.variante
+        print("modus.codierer ist = " + self.modus.codierer)
+
         if self.modus.codierer == "computer":
-            self.codierer = ComputerPlayer(param.algorithmus)
-            print(f"Variante im Game Layer: {self.variante}")
-            self.secret_code=self.codierer.generiereGeheimeCode(self.variante)
-            print(f"Code im Game Layer: {self.secret_code}")
+            try:
+                self.codierer = ComputerPlayer(None)
+                # Teste die Methode direkt
+                test_code = self.codierer.generiereGeheimeCode(self.variante)
+                self.secret_code = test_code
+
+                farb_namen = [f.name for f in self.secret_code.farben]
+                print(f"Code ist: {farb_namen}")  # Gibt die Liste direkt aus
+
+            except Exception as e:
+                print(f"FEHLER: {e}")
+                import traceback
+                traceback.print_exc()  # Vollständiger Stacktrace
+                raise
         else:
-            self.codierer=HumanPlayer()
-            self.secret_code=param.code
+            self.codierer = MenschPlayer()
+            if param.code is None:
+                raise ValueError(f"Im Modus {self.modus.name} muss ein Code übergeben werden!")
+            self.secret_code = param.code
+
+        # Rater initialisieren
         if self.modus.rater == "computer":
             self.rater = ComputerPlayer(param.algorithmus)
         else:
-            self.rater=HumanPlayer()
+            self.rater = MenschPlayer()
+
         self.runden: list[SpielRunde] = []
         self.erfolgreich = False
 

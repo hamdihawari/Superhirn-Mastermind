@@ -143,6 +143,7 @@ def generate_random_code(cls, steckplaetze: int, erlaubte_farben: List[Farbe]) -
     print(f"Algorithmus: {spielparameter.algorithmus}")
     print(f"Verzögerung: {spielparameter.delay} Sekunden")
     print(f"Code: {code}")
+    print("-------------------------------")
 
     # Spiel starten und Engine-Objekt erhalten
     starter = Spielstarter()
@@ -159,11 +160,13 @@ def generate_random_code(cls, steckplaetze: int, erlaubte_farben: List[Farbe]) -
     """
     def on_rateversuch_erhalten(versuch: List[str], zeile: int):
         print(f"\n--- Rateversuch (Zeile {zeile + 1}) ---")
-        print(f"Empfangener Versuch: {versuch}")
 
         #  Bewertung stattfinden
         farb_versuch = Code([Farbe[farbe] for farbe in versuch])
-        print(f"der Rateversuch: {farb_versuch}")
+        print(f"Typ von farb_versuch: {type(farb_versuch)}")                                        # Kontrolle ob farb_versuch Code Objekt ist
+
+        farb_namen = [f.name for f in farb_versuch.farben]
+        print(f"Farben des Rateversuchs : {farb_namen}")
 
         # Führe den Versuch aus
         feedback = spiel_engine.fuehreZugAus(farb_versuch)
