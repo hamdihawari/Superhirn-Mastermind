@@ -1,12 +1,15 @@
+from typing import List
 from src.anwendung import modus
 from src.anwendung.spielparameter import Spielparameter
 from src.spiel.farbe import Farbe
 from src.spiel.spielCodes import Code, Feedback
 from src.spiel.spielrunde import SpielRunde
 from src.spiel.strategie.player import Player
+from src.spiel.variante import Variante
 from typing import Optional
-
+from typing import Optional
 from src.spiel.strategie.playerType import ComputerPlayer, HumanPlayer
+
 
 
 class Game:
@@ -31,6 +34,7 @@ class Game:
     def fuehreRateversuchDurch(self,code:Code) -> Feedback:
         if self.rater == "computer":
             code=self.rater.generiereVersuch(self.runden)
+
         feedback = self.berechneFeedback(code)
         erfolgreich = feedback.schwarz == self.variante.steckplaetze
 
@@ -47,6 +51,8 @@ class Game:
     def istFertig(self) -> bool:
         return any(r.erfolgreich for r in self.runden) or \
                len(self.runden) >= self.variante.maxVersuche
+
+
 
 
 
