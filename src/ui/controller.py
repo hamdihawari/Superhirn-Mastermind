@@ -3,7 +3,7 @@ from typing import List
 
 from anwendung import spielengine, spielstart
 from anwendung.spielstart import Spielstarter
-from spiel.farbe import Farbe
+from src.spiel.farbe import Farbe
 from anwendung.modus import Modus
 from src.anwendung.spielparameter import Spielparameter
 from src.spiel.variante import Variante
@@ -21,6 +21,7 @@ root.resizable(False, False)
 uebersicht_frame = None
 spieleinstellungen_frame = None
 spieloberflaeche_frame = None
+
 
 # Standardwerte
 spielVariante = Variante.SUPER
@@ -163,14 +164,17 @@ def generate_random_code(cls, steckplaetze: int, erlaubte_farben: List[Farbe]) -
 
         #  Bewertung stattfinden
         farb_versuch = Code([Farbe[farbe] for farbe in versuch])
-        print(f"Typ von farb_versuch: {type(farb_versuch)}")                                        # Kontrolle ob farb_versuch Code Objekt ist
 
         farb_namen = [f.name for f in farb_versuch.farben]
         print(f"Farben des Rateversuchs : {farb_namen}")
 
-        # Führe den Versuch aus
         feedback = spiel_engine.fuehreZugAus(farb_versuch)
         print(f"Feedback: {feedback.schwarz} schwarz, {feedback.weiss} weiß")
+        zeige_feedback(zeile, feedback)
+
+
+        if spiel_engine.istFertig():
+            print("Spiel beendet")
 
     # Controller wird NICHT gebraucht (wir nutzen nur den Callback direkt)
     if spieleinstellungen_frame:
@@ -180,10 +184,10 @@ def generate_random_code(cls, steckplaetze: int, erlaubte_farben: List[Farbe]) -
     if spieloberflaeche_frame:
         spieloberflaeche_frame.destroy()
 
-    spieloberflaeche_frame = create_spieloberfläche(
+    spieloberflaeche_frame, zeige_feedback = create_spieloberfläche(
         root,
         spielparameter,
-        on_rateversuch_erhalten  # Einziger Callback: Übermittelt den Versuch an den Controller
+        on_rateversuch_erhalten,  # Einziger Callback: Übermittelt den Versuch an den Controller
     )
     spieloberflaeche_frame.pack(fill="both", expand=True)
 

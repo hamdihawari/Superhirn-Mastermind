@@ -7,7 +7,7 @@ from src.spiel.variante import Farbe
 def create_spieloberfläche(
     root,
     spielparameter: Spielparameter,
-    on_rateversuch_erhalten: Callable  # Einziger Callback: Sendet Versuch an Controller
+    on_rateversuch_erhalten: Callable,  # Einziger Callback: Sendet Versuch an Controller
 ):
     # Hauptframe
     frame = tk.Frame(root, bg="#D2B48C")
@@ -36,12 +36,47 @@ def create_spieloberfläche(
     # 10 Zeilen für das Spiel erstellen
     for zeile in range(10):
         steine = []
+        feedback_steine = []
+
         for spalte in range(spielparameter.variante.steckplaetze):
             x = 50 + spalte * 50
             y = 50 + zeile * 40
             kreis = canvas.create_oval(x, y, x + 30, y + 30, fill="white", outline="black")
             steine.append(kreis)
-        alle_zeilen.append({"steine": steine})
+
+        import math
+
+        feedback_count = spielparameter.variante.steckplaetze
+        cols = math.ceil(feedback_count / 2)
+
+        for i in range(feedback_count):
+            col = i % cols
+            row = i // cols
+
+            fx = (
+                    50
+                    + spielparameter.variante.steckplaetze * 50
+                    + 20
+                    + col * 15
+            )
+            fy = (
+                    50
+                    + zeile * 40
+                    + row * 15
+            )
+
+            fb = canvas.create_oval(
+                fx, fy,
+                fx + 10, fy + 10,
+                fill="gray",
+                outline="black"
+            )
+            feedback_steine.append(fb)
+
+        alle_zeilen.append({
+            "steine": steine,
+            "feedback": feedback_steine
+        })
 
     # --- Dropdown und Button untereinander ---
     # Dropdown für Farbauswahl
@@ -68,6 +103,19 @@ def create_spieloberfläche(
             bg="#8B4513", fg="white"
         ).pack(side="left", padx=2)
 
+    def zeige_feedback(zeile: int, feedback):
+        feedback_steine = alle_zeilen[zeile]["feedback"]
+
+        index = 0
+
+        for _ in range(feedback.schwarz):
+            canvas.itemconfig(feedback_steine[index], fill="black")
+            index += 1
+
+        for _ in range(feedback.weiss):
+            canvas.itemconfig(feedback_steine[index], fill="white")
+            index += 1
+
     # --- Bestätigungsbutton (unter dem Dropdown) ---
     def bestätige_rateversuch():
         nonlocal aktuelle_zeile
@@ -90,4 +138,4 @@ def create_spieloberfläche(
         font=("Arial", 12, "bold")
     ).pack(pady=10)
 
-    return frame
+    return frame, zeige_feedback

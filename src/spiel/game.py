@@ -75,6 +75,10 @@ class Game:
         geheim: list[Optional[Farbe]] = list(self.secret_code.farben)
         geraten: list[Optional[Farbe]] = list(rate_code.farben)
 
+        print("-------im Game Layer - Feedback ----------")
+        print(f"so sieht der geratete Code aus : {geheim}")
+        print(f"so sieht der geratete Code aus : {geraten}")
+
         schwarz = 0
         weiss = 0
 
