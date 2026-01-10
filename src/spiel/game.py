@@ -18,13 +18,8 @@ class Game:
         if self.modus.codierer == "computer":
             try:
                 self.codierer = ComputerPlayer(None)
-                # Teste die Methode direkt
                 test_code = self.codierer.generiereGeheimeCode(self.variante)
                 self.secret_code = test_code
-
-                farb_namen = [f.name for f in self.secret_code.farben]
-                #print(f"Code ist: {farb_namen}")  # Gibt die Liste direkt aus
-
             except Exception as e:
                 print(f"FEHLER: {e}")
                 import traceback
@@ -47,10 +42,9 @@ class Game:
         self.runden: list[SpielRunde] = []
         self.erfolgreich = False
 
-    def fuehreRateversuchDurch(self,code:Code) -> Feedback:
-        print("test 1111")
+    def fuehreRateversuchDurch(self,code:Code | None) -> Feedback:
 
-        if self.rater == "computer":
+        if self.modus.rater == "computer":
             code=self.rater.generiereVersuchMitVariante(self.runden,self.variante)
         feedback = self.berechneFeedback(code)
         erfolgreich = feedback.schwarz == self.variante.steckplaetze

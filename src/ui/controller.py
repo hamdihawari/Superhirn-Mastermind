@@ -26,7 +26,7 @@ spieloberflaeche_frame = None
 # Standardwerte
 spielVariante = Variante.SUPER
 spielModus = Modus.M_C
-spielAlgorithmus = "Knuth"
+spielAlgorithmus = "knuth"
 spielSprache = Sprache.DEUTSCH
 spielcode = None
 spielZeit = None
@@ -139,6 +139,27 @@ def on_code_spiel_start(code: Code, zeit: int):
     starter = Spielstarter()
     spiel_engine = starter.starteSpiel(spielparameter)
 
+    """
+    Mensch ist Codierer
+        -> empfangen von rateversuch und feedback
+        und Ausgabe in der spieloberfläche 
+    """
+
+    def rateversuch_erhalten_mensch_Codierer():
+        feedback = spiel_engine.fuehreZugAus(None)
+
+        letzte_runde = spiel_engine.spiel.runden[-1]
+
+        zeile = letzte_runde.rundenNr - 1
+        zeige_feedback(zeile, feedback)
+
+        if spiel_engine.istFertig():
+            print("Spiel beendet")
+
+    def auto_raten():
+        if not spiel_engine.istFertig():
+            rateversuch_erhalten_mensch_Codierer()
+            root.after(spielparameter.delay * 1000, auto_raten)
 
     """
     Einziger Callback: Empfängt den Rateversuch vom GUI
@@ -177,6 +198,9 @@ def on_code_spiel_start(code: Code, zeit: int):
         spielModus
     )
     spieloberflaeche_frame.pack(fill="both", expand=True)
+
+    if spielModus.codierer == "mensch":
+        auto_raten()
 
 show_uebersicht()
 root.mainloop()
