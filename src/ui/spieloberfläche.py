@@ -3,6 +3,7 @@ from typing import List, Callable
 from tkinter import Canvas
 
 from spiel.spielCodes import Code
+from spiel.variante import Variante
 from src.anwendung.spielparameter import Spielparameter
 from src.spiel.variante import Farbe
 from ui.sichtbarkeiten import Sichtbarkeiten

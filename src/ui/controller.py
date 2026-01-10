@@ -14,8 +14,8 @@ from ui.sichtbarkeiten import Sichtbarkeiten
 # Hauptfenster
 root = tk.Tk()
 root.title("Superhirn")
-root.geometry("700x600")
-root.resizable(False, False)
+root.geometry("800x600")
+#root.resizable(False, False)
 
 # Globale Variablen für die Frames
 uebersicht_frame = None
@@ -114,10 +114,12 @@ def show_spieleinstellungen():
 def on_code_spiel_start(code: Code, zeit: int):
     global spieloberflaeche_frame
 
+    algorithmus = spielAlgorithmus if spielModus.rater == "computer" else None
+
     spielparameter = Spielparameter(
         variante=spielVariante,
         modus=spielModus,
-        algorithmus=spielAlgorithmus if spielModus == Modus.M_C else None,
+        algorithmus=algorithmus,
         delay=zeit,
         code=code
     )
@@ -173,12 +175,10 @@ def on_code_spiel_start(code: Code, zeit: int):
     Mensch ist Rater 
     
     Einziger Callback: Empfängt den Rateversuch vom GUI
-        Wird aufgerufen, wenn der Spieler einen Versuch bestätigt.
-        farb_versuch wird an Spiel übergeben und feedback wird dann gespeichert 
+        Wird aufgerufen, wenn der Spieler einen Versuch bestätigt 
     """
 
     def on_rateversuch_erhalten_menschRater(versuch: List[str], zeile: int):
-
 
         farb_versuch = Code([Farbe[farbe] for farbe in versuch])
         farb_namen = [f.name for f in farb_versuch.farben]
@@ -191,6 +191,22 @@ def on_code_spiel_start(code: Code, zeit: int):
         if spiel_engine.istFertig():
             print("Spiel beendet")
 
+
+    """
+    Computer ist Rater und Codierer 
+    
+    
+
+    def rateversuch_feedback_erhalten_computer_computer():
+        # speicher das Feedback
+        feedback = spiel_engine.fuehreZugAus(None)
+
+
+    def auto_raten_doppel_computer():
+        pass
+        
+    """
+
     # Controller wird NICHT gebraucht (wir nutzen nur den Callback direkt)
     if spieleinstellungen_frame:
         spieleinstellungen_frame.pack_forget()
@@ -201,7 +217,7 @@ def on_code_spiel_start(code: Code, zeit: int):
 
 
     """
-    Erstellung der Spieloberfläche --> Feedback wird übermittelt 
+    Erstellung der Spieloberfläche 
     """
     spieloberflaeche_frame, zeige_feedback, zeige_runde_code, zeige_fehlermeldung = create_spieloberfläche(
         root,
@@ -217,6 +233,11 @@ def on_code_spiel_start(code: Code, zeit: int):
 
     if spielModus.codierer == "mensch":
         auto_raten()
+
+
+    if spielModus.codierer == "computer" and spielModus.rater == "computer":
+        auto_raten()
+
 
 show_uebersicht()
 root.mainloop()
