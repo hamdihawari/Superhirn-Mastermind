@@ -29,5 +29,5 @@ class Knuth(AlgorithmusStrategie):
             guess = Code(random.choices(variante.erlaubteFarben, k=variante.steckplaetze))
             if tuple(guess.farben) not in used:
                 return guess
-
-        return Code(random.choices(variante.erlaubteFarben, k=variante.steckplaetze))
+        code = Code(random.choices(variante.erlaubteFarben, k=variante.steckplaetze))
+        return code

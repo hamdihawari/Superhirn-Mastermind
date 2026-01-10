@@ -26,7 +26,7 @@ spieloberflaeche_frame = None
 # Standardwerte
 spielVariante = Variante.SUPER
 spielModus = Modus.M_C
-spielAlgorithmus = "Knuth"
+spielAlgorithmus = "knuth"
 spielSprache = Sprache.DEUTSCH
 spielcode = None
 spielZeit = None
@@ -160,8 +160,6 @@ def on_code_spiel_start(code: Code, zeit: int):
         if not spiel_engine.istFertig():
             rateversuch_erhalten_mensch_Codierer()
             root.after(spielparameter.delay * 1000, auto_raten)
-
-
 
     """
     Einziger Callback: Empfängt den Rateversuch vom GUI
