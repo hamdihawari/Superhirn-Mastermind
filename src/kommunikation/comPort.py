@@ -27,7 +27,7 @@ class ComPort(ABC):
 
 class ComJson(ComPort):
 
-    def __init__(self, ):
+    def __init__(self):
         super().__init__()
         self.message = {
                       "gameid" : 0,
@@ -39,15 +39,21 @@ class ComJson(ComPort):
     def starte(self, variante: Variante) -> bool:
         v = variante
 
+        # Anzahl an Farben und Steckplätze in die Nachricht schreiben
         self.message["positions"] = v.steckplaetze
         self.message["colors"] = v.anzahlFarben
 
+        # Nachricht erstes Mal verschicken und Antwort empfangen
         response = rq.post("http://141.45.34.161:5001/", json = self.message)
         response_status = response.status_code
         response_json = response.json()
 
+        #gameid überschreiben
         self.message["gameid"] = response_json["gameid"]
 
+        # wenn der Server geantwortet(200er code) hat
+        # und die gameid richtig überschrieben wurde(ist am anfang 0)
+        # wird true zurückgegeben sonst false
         if response_status == 200 and response_json["gameid"] != 0:
             return True
         else:
@@ -59,7 +65,6 @@ class ComJson(ComPort):
         for farbe in code.farben:
             uebersetzter_code += str(farbe.value)
 
-        uebersetzter_code = int(uebersetzter_code)
 
         # übersetzten Farbencode in message schreiben
         self.message["value"] = uebersetzter_code
@@ -69,10 +74,17 @@ class ComJson(ComPort):
         response_json = response.json()
 
         #Antwort in feedback schreiben und dabei die integer in Farben umwandeln
-        response_zahlencode = str(response_json["value"])
-        feedback = []
+        response_zahlencode = response_json["value"]
+        schwarz = 0
+        weiss = 0
         for z in response_zahlencode:
-            feedback.append(Farbe(int(z))) # wie genau soll feedback dann aussehen?
+            if int(z) == 8:
+                schwarz = schwarz + 1
+            if int(z) == 7:
+                weiss = weiss + 1
+
+        feedback = Feedback(schwarz, weiss)
+
 
         return feedback
 
