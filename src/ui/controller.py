@@ -187,9 +187,8 @@ def on_code_spiel_start(code: Code, zeit: int):
             erlaubte_farben = [f.name for f in spielparameter.variante.erlaubteFarben]
             for farbe in versuch:
                 if farbe not in erlaubte_farben:
-                    print(f"Fehler: Die Farbe '{farbe}' ist nicht erlaubt!")
                     zeige_fehlermeldung("Keine weißen Steine übrig lassen !")
-                    return  # Abbrechen, wenn Validierung fehlschlägt
+                    return
 
         # 3. Wenn Validierung erfolgreich: Weiter mit dem Spiel
         farb_versuch = Code([Farbe[farbe] for farbe in versuch])
