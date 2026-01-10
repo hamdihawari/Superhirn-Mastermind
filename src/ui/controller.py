@@ -178,17 +178,18 @@ def on_code_spiel_start(code: Code, zeit: int):
         farb_versuch wird an Spiel übergeben und feedback wird dann gespeichert 
     """
     def on_rateversuch_erhalten_menschRater(versuch: List[str], zeile: int):
-        # 1. Prüfe, ob alle Steckplätze ausgefüllt sind (kein "WEISS" mehr übrig)
-        if "WEISS" in versuch:
-            zeige_fehlermeldung("Keine weißen Steine übrig lassen !")
-            return
-        # 2. Prüfe, ob nur erlaubte Farben verwendet werden
-        erlaubte_farben = [f.name for f in spielparameter.variante.erlaubteFarben]
-        for farbe in versuch:
-            if farbe not in erlaubte_farben:
-                print(f"Fehler: Die Farbe '{farbe}' ist nicht erlaubt!")
+        if spielVariante == spielparameter.variante.SUPER:
+            # 1. Prüfe, ob alle Steckplätze ausgefüllt sind (kein "WEISS" mehr übrig)
+            if "WEISS" in versuch:
                 zeige_fehlermeldung("Keine weißen Steine übrig lassen !")
-                return  # Abbrechen, wenn Validierung fehlschlägt
+                return
+            # 2. Prüfe, ob nur erlaubte Farben verwendet werden
+            erlaubte_farben = [f.name for f in spielparameter.variante.erlaubteFarben]
+            for farbe in versuch:
+                if farbe not in erlaubte_farben:
+                    print(f"Fehler: Die Farbe '{farbe}' ist nicht erlaubt!")
+                    zeige_fehlermeldung("Keine weißen Steine übrig lassen !")
+                    return  # Abbrechen, wenn Validierung fehlschlägt
 
         # 3. Wenn Validierung erfolgreich: Weiter mit dem Spiel
         farb_versuch = Code([Farbe[farbe] for farbe in versuch])
