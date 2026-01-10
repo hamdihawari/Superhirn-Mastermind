@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 
 class Knuth(AlgorithmusStrategie):
-    def berechneNaechstenVersuch(self, runden: List["SpielRunde"], variante: Variante) -> Code:
+    def berechneNaechstenVersuch(self, runden: List[SpielRunde], variante: Variante) -> Code:
         used: Set[Tuple] = {tuple(r.code.farben) for r in runden}
 
         if not runden:

@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from src.spiel.spielrunde import SpielRunde
 
 class StepByStep(AlgorithmusStrategie):
-    def berechneNaechstenVersuch(self, runden: List["SpielRunde"], variante: Variante) -> Code:
+    def berechneNaechstenVersuch(self, runden: List[SpielRunde], variante: Variante) -> Code:
         # ًWICHTIG_: Erzeugt schrittweise neue, noch nicht verwendete Codes
         used: Set[Tuple] = set()
         for r in runden:

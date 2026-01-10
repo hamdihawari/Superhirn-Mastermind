@@ -3,6 +3,7 @@ from __future__ import annotations
 import random
 from typing import List
 
+from spiel.strategie.algoStrat import AlgorithmusFactory
 from src.spiel.spielCodes import Code
 from src.spiel.spielrunde import SpielRunde
 from src.spiel.strategie.player import Player
@@ -11,7 +12,7 @@ from src.spiel.variante import Variante
 
 class ComputerPlayer(Player):
     def __init__(self, algorithmus_name: str | None = None):
-        self.algorithmus = algorithmus_name
+        self.algo = AlgorithmusFactory.create(algorithmus_name)
         print(" --- COMPUTER PLAYER INITIALIZATION ---")
 
     def generiereGeheimeCode(self, variante: Variante) -> Code:
@@ -34,8 +35,8 @@ class ComputerPlayer(Player):
             variante: Variante
     ) -> Code:
 
-        if self.algorithmus is None:
+        if self.algo is None:
             raise ValueError("ComputerPlayer hat keinen Algorithmus!")
 
-        return self.algorithmus.berechneNaechstenVersuch(runden, variante)
+        return self.algo.berechneNaechstenVersuch(runden, variante)
 
