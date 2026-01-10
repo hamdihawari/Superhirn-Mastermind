@@ -141,44 +141,63 @@ def on_code_spiel_start(code: Code, zeit: int):
 
     """
     Mensch ist Codierer
+    
         -> empfangen von rateversuch und feedback
         und Ausgabe in der spieloberfläche 
     """
-
     def rateversuch_erhalten_mensch_Codierer():
         feedback = spiel_engine.fuehreZugAus(None)
-
         letzte_runde = spiel_engine.spiel.runden[-1]
-
         zeile = letzte_runde.rundenNr - 1
-        zeige_feedback(zeile, feedback)
+
+        # Zeige den Ratecode des Computers an
+        runde_code = letzte_runde.code
+
+        zeige_feedback(zeile, feedback)             # Hier wird das Feedback an die GUI übergeben, siehe unten bei Erstellung der GUI
+
+
+        print(f"Aktueller Ratecode: {[f.name for f in runde_code.farben]}")  # Debug-Ausgabe
+        zeige_runde_code(zeile, runde_code)
 
         if spiel_engine.istFertig():
             print("Spiel beendet")
 
+    """
+    mit einen Timer von 1 - 5 sekunden wird der Rateversuch ausgegeben 
+    """
     def auto_raten():
         if not spiel_engine.istFertig():
             rateversuch_erhalten_mensch_Codierer()
             root.after(spielparameter.delay * 1000, auto_raten)
 
     """
+    Mensch ist Rater 
+    
     Einziger Callback: Empfängt den Rateversuch vom GUI
         Wird aufgerufen, wenn der Spieler einen Versuch bestätigt.
         farb_versuch wird an Spiel übergeben und feedback wird dann gespeichert 
     """
     def on_rateversuch_erhalten_menschRater(versuch: List[str], zeile: int):
-        # print(f"\n--- Rateversuch (Zeile {zeile + 1}) ---")
+        # 1. Prüfe, ob alle Steckplätze ausgefüllt sind (kein "WEISS" mehr übrig)
+        if "WEISS" in versuch:
+            zeige_fehlermeldung("Keine weißen Steine übrig lassen !")
+            return
+        # 2. Prüfe, ob nur erlaubte Farben verwendet werden
+        erlaubte_farben = [f.name for f in spielparameter.variante.erlaubteFarben]
+        for farbe in versuch:
+            if farbe not in erlaubte_farben:
+                print(f"Fehler: Die Farbe '{farbe}' ist nicht erlaubt!")
+                zeige_fehlermeldung("Keine weißen Steine übrig lassen !")
+                return  # Abbrechen, wenn Validierung fehlschlägt
 
-
+        # 3. Wenn Validierung erfolgreich: Weiter mit dem Spiel
         farb_versuch = Code([Farbe[farbe] for farbe in versuch])
-
         farb_namen = [f.name for f in farb_versuch.farben]
         print(f"Farben des Rateversuchs : {farb_namen}")
 
         feedback = spiel_engine.fuehreZugAus(farb_versuch)
         print(f"Feedback: {feedback.schwarz} schwarz, {feedback.weiss} weiß")
         zeige_feedback(zeile, feedback)
-
 
         if spiel_engine.istFertig():
             print("Spiel beendet")
@@ -191,13 +210,21 @@ def on_code_spiel_start(code: Code, zeit: int):
     if spieloberflaeche_frame:
         spieloberflaeche_frame.destroy()
 
-    spieloberflaeche_frame, zeige_feedback = create_spieloberfläche(
+
+    """
+    Erstellung der Spieloberfläche --> Feedback wird übermittelt 
+    """
+    spieloberflaeche_frame, zeige_feedback, zeige_runde_code, zeige_fehlermeldung = create_spieloberfläche(
         root,
         spielparameter,
         on_rateversuch_erhalten_menschRater,  # Einziger Callback: Übermittelt den Versuch an den Controller
         spielModus
     )
     spieloberflaeche_frame.pack(fill="both", expand=True)
+
+    # Speichere zeige_fehlermeldung global oder in einer Klasse, falls nötig
+    global fehlermeldung_funktion
+    fehlermeldung_funktion = zeige_fehlermeldung
 
     if spielModus.codierer == "mensch":
         auto_raten()
