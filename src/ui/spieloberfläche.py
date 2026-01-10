@@ -3,12 +3,18 @@ from typing import List, Callable
 from tkinter import Canvas
 from src.anwendung.spielparameter import Spielparameter
 from src.spiel.variante import Farbe
+from ui.sichtbarkeiten import Sichtbarkeiten
+
+
 
 def create_spieloberfläche(
     root,
     spielparameter: Spielparameter,
-    on_rateversuch_erhalten: Callable,  # Einziger Callback: Sendet Versuch an Controller
+    on_rateversuch_erhalten: Callable,  # Einziger Callback: Sendet Rateversuch an Controller
+    spielmodus
 ):
+    sichtbarkeiten = Sichtbarkeiten.get_sichtbarkeit(spielmodus)
+
     # Hauptframe
     frame = tk.Frame(root, bg="#D2B48C")
     frame.pack(fill="both", expand=True, padx=10, pady=10)
@@ -20,6 +26,9 @@ def create_spieloberfläche(
     # --- Steuerung (rechts) ---
     steuerungs_frame = tk.Frame(frame, bg="#D2B48C")
     steuerungs_frame.pack(side="right", fill="y", padx=10, pady=10)
+
+
+
 
     # Farben und Zuordnung
     farben = [farbe.name for farbe in spielparameter.variante.erlaubteFarben]
@@ -38,12 +47,14 @@ def create_spieloberfläche(
         steine = []
         feedback_steine = []
 
+        # Rateversuch - Steckplätze
         for spalte in range(spielparameter.variante.steckplaetze):
             x = 50 + spalte * 50
             y = 50 + zeile * 40
             kreis = canvas.create_oval(x, y, x + 30, y + 30, fill="white", outline="black")
             steine.append(kreis)
 
+        # Feedback - Steckplätze
         import math
 
         feedback_count = spielparameter.variante.steckplaetze
@@ -78,30 +89,33 @@ def create_spieloberfläche(
             "feedback": feedback_steine
         })
 
-    # --- Dropdown und Button untereinander ---
-    # Dropdown für Farbauswahl
-    farbauswahl_var = tk.StringVar(steuerungs_frame)
-    farbauswahl_var.set(farben[0])
-    dropdown = tk.OptionMenu(steuerungs_frame, farbauswahl_var, *farben)
-    dropdown.config(bg="#D2B48C")
-    dropdown.pack(pady=5)
+    """
+    Mensch ist Rater -> dann zeige Farbauswahl an 
+    """
+    if sichtbarkeiten["show_code_auswahl_spiel_ui"]:
+        farbauswahl_var = tk.StringVar(steuerungs_frame)
+        farbauswahl_var.set(farben[0])
+        dropdown = tk.OptionMenu(steuerungs_frame, farbauswahl_var, *farben)
+        dropdown.config(bg="#D2B48C")
+        dropdown.pack(pady=5)
 
-    # Stein-Auswahl-Buttons (horizontal)
-    stein_buttons_frame = tk.Frame(steuerungs_frame, bg="#D2B48C")
-    stein_buttons_frame.pack(pady=5)
+        # Stein-Auswahl-Buttons (horizontal)
+        stein_buttons_frame = tk.Frame(steuerungs_frame, bg="#D2B48C")
+        stein_buttons_frame.pack(pady=5)
 
-    def setze_farbe(spalte):
-        farbe_name = farbauswahl_var.get()
-        farbe_hex = farb_zuordnung[farbe_name]
-        canvas.itemconfig(alle_zeilen[aktuelle_zeile]["steine"][spalte], fill=farbe_hex)
+        def setze_farbe(spalte):
+            farbe_name = farbauswahl_var.get()
+            farbe_hex = farb_zuordnung[farbe_name]
+            canvas.itemconfig(alle_zeilen[aktuelle_zeile]["steine"][spalte], fill=farbe_hex)
 
-    for spalte in range(spielparameter.variante.steckplaetze):
-        tk.Button(
-            stein_buttons_frame,
-            text=f"Stein {spalte + 1}",
-            command=lambda s=spalte: setze_farbe(s),
-            bg="#8B4513", fg="white"
-        ).pack(side="left", padx=2)
+        for spalte in range(spielparameter.variante.steckplaetze):
+            tk.Button(
+                stein_buttons_frame,
+                text=f"Stein {spalte + 1}",
+                command=lambda s=spalte: setze_farbe(s),
+                bg="#8B4513", fg="white"
+            ).pack(side="left", padx=2)
+
 
     def zeige_feedback(zeile: int, feedback):
         feedback_steine = alle_zeilen[zeile]["feedback"]

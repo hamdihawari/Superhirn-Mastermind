@@ -19,7 +19,6 @@ def create_spieleinstellungen_superhirn_frame(
 
     # Sichtbarkeiten basierend auf dem Modus holen
     sichtbarkeiten = Sichtbarkeiten.get_sichtbarkeit(spielmodus)
-    print(f"Sichtbarkeiten in create_spieleinstellungen_superhirn_frame: {sichtbarkeiten}")  # Debug-Ausgabe
 
     frame = tk.Frame(root)
     farbe_vars = []  # Speichert alle StringVars der OptionMenüs

@@ -86,9 +86,7 @@ def show_spieleinstellungen():
     if spieleinstellungen_frame:
         spieleinstellungen_frame.destroy()
 
-    print(f"Aktueller Modus: {spielModus}")  # Debug-Ausgabe
     sichtbarkeiten = Sichtbarkeiten.get_sichtbarkeit(spielModus)
-    print(f"Sichtbarkeiten: {sichtbarkeiten}")  # Debug-Ausgabe
 
     from Spieleinstellungen import create_spieleinstellungen_superhirn_frame
     # Erstelle das neue Frame
@@ -110,24 +108,11 @@ def show_spieleinstellungen():
     1. Spieloberfläche erzeugt werden und Spielstart erzeugt werden -> danach wird ein EngineInt zurückgegeben
 
 """
+
+
+
 def on_code_spiel_start(code: Code, zeit: int):
     global spieloberflaeche_frame
-
-    print(f" der Code ist gerade : {code}")
-
-    """ Fall 1: code ist None → Computer generiert einen zufälligen Code
-    if code is None:
-        code = Code.generate_random_code(spielVariante.steckplaetze, spielVariante.erlaubteFarben)
-
-        das hier müsste dann in Code Klasse :
-        @classmethod
-def generate_random_code(cls, steckplaetze: int, erlaubte_farben: List[Farbe]) -> 'Code':
-    import random
-    return Code(random.choices(erlaubte_farben, k=steckplaetze))
-    """
-
-    if code is not None and not isinstance(code, Code ):                                              # Stelle sicher, dass der Code ein Code-Objekt ist
-        code = Code([Farbe[farbe] for farbe in code])
 
     spielparameter = Spielparameter(
         variante=spielVariante,
@@ -141,28 +126,29 @@ def generate_random_code(cls, steckplaetze: int, erlaubte_farben: List[Farbe]) -
     print("\n--- Spielparameter ---")
     print(f"Variante: {spielparameter.variante.name}")
     print(f"Modus: {spielparameter.modus.name}")
+    print(f"der Codierer ist {spielparameter.modus.codierer}")
     print(f"Algorithmus: {spielparameter.algorithmus}")
     print(f"Verzögerung: {spielparameter.delay} Sekunden")
-    print(f"Code: {code}")
+    if code is not None:
+        print("SpielCode:", [f.name for f in code.farben])                   # gibt das jeweilige Element aus .name aus der ENUM
+    else:
+        print("Code: None")
     print("-------------------------------")
 
     # Spiel starten und Engine-Objekt erhalten
     starter = Spielstarter()
     spiel_engine = starter.starteSpiel(spielparameter)
 
+
     """
     Einziger Callback: Empfängt den Rateversuch vom GUI
         Wird aufgerufen, wenn der Spieler einen Versuch bestätigt.
-        Args:
-            versuch: Liste der Farben (z. B. ["ROT", "GRUEN", "BLAU", "GELB"])
-            zeile: Aktuelle Zeile (0-9)
-
         farb_versuch wird an Spiel übergeben und feedback wird dann gespeichert 
     """
-    def on_rateversuch_erhalten(versuch: List[str], zeile: int):
-        print(f"\n--- Rateversuch (Zeile {zeile + 1}) ---")
+    def on_rateversuch_erhalten_menschRater(versuch: List[str], zeile: int):
+        # print(f"\n--- Rateversuch (Zeile {zeile + 1}) ---")
 
-        #  Bewertung stattfinden
+
         farb_versuch = Code([Farbe[farbe] for farbe in versuch])
 
         farb_namen = [f.name for f in farb_versuch.farben]
@@ -187,7 +173,8 @@ def generate_random_code(cls, steckplaetze: int, erlaubte_farben: List[Farbe]) -
     spieloberflaeche_frame, zeige_feedback = create_spieloberfläche(
         root,
         spielparameter,
-        on_rateversuch_erhalten,  # Einziger Callback: Übermittelt den Versuch an den Controller
+        on_rateversuch_erhalten_menschRater,  # Einziger Callback: Übermittelt den Versuch an den Controller
+        spielModus
     )
     spieloberflaeche_frame.pack(fill="both", expand=True)
 

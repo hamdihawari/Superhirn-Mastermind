@@ -14,7 +14,6 @@ class Game:
     def __init__(self, param: Spielparameter):
         self.modus = param.modus
         self.variante = param.variante
-        print("modus.codierer ist = " + self.modus.codierer)
 
         if self.modus.codierer == "computer":
             try:
@@ -24,7 +23,7 @@ class Game:
                 self.secret_code = test_code
 
                 farb_namen = [f.name for f in self.secret_code.farben]
-                print(f"Code ist: {farb_namen}")  # Gibt die Liste direkt aus
+                #print(f"Code ist: {farb_namen}")  # Gibt die Liste direkt aus
 
             except Exception as e:
                 print(f"FEHLER: {e}")
@@ -39,6 +38,8 @@ class Game:
 
         # Rater initialisieren
         if self.modus.rater == "computer":
+            print(f"ALGORITHMUS IST : {param.algorithmus}")
+            print(type(param.algorithmus))
             self.rater = ComputerPlayer(param.algorithmus)
         else:
             self.rater = MenschPlayer()
@@ -47,8 +48,10 @@ class Game:
         self.erfolgreich = False
 
     def fuehreRateversuchDurch(self,code:Code) -> Feedback:
+        print("test 1111")
+
         if self.rater == "computer":
-            code=self.rater.generiereVersuch(self.runden)
+            code=self.rater.generiereVersuchMitVariante(self.runden,self.variante)
         feedback = self.berechneFeedback(code)
         erfolgreich = feedback.schwarz == self.variante.steckplaetze
 
@@ -59,6 +62,13 @@ class Game:
             erfolgreich=erfolgreich
         )
         self.runden.append(runde)
+
+        # DEBUG-Ausgabe der Spielrunde
+        print(f"\n Runde {runde.rundenNr}")
+        print("Geratener Code :", [f.name for f in runde.code.farben])
+        print(f"Feedback       : {runde.feedback.schwarz} schwarz,"
+              f" {runde.feedback.weiss} weiß")
+
         self.istFertig()
         return feedback
 

@@ -11,7 +11,8 @@ from src.spiel.variante import Variante
 
 class ComputerPlayer(Player):
     def __init__(self, algorithmus_name: str | None = None):
-        self.algorithmus = self._erstelleAlgorithmus(algorithmus_name) if algorithmus_name else None
+        self.algorithmus = algorithmus_name
+        print(" --- COMPUTER PLAYER INITIALIZATION ---")
 
     def generiereGeheimeCode(self, variante: Variante) -> Code:
 
@@ -27,6 +28,14 @@ class ComputerPlayer(Player):
             "ComputerPlayer: Bitte generiereVersuchMitVariante(runden, variante) verwenden."
         )
 
-    def generiereVersuchMitVariante(self, runden: List[SpielRunde], variante: Variante) -> Code:
+    def generiereVersuchMitVariante(
+            self,
+            runden: List[SpielRunde],
+            variante: Variante
+    ) -> Code:
+
+        if self.algorithmus is None:
+            raise ValueError("ComputerPlayer hat keinen Algorithmus!")
+
         return self.algorithmus.berechneNaechstenVersuch(runden, variante)
 
