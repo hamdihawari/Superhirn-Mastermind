@@ -163,9 +163,21 @@ def create_spieloberfläche(
                 farbe_name = farb_rückzuordnung.get(farbe_hex, "WEISS")
                 versuch.append(farbe_name)
 
+            # --- VALIDIERUNG DIREKT IN DER GUI ---
+            if "WEISS" in versuch:
+                zeige_fehlermeldung("Keine weißen Steine übrig lassen.")
+                return  # Abbrechen, Zeile wird NICHT erhöht
+
+            erlaubte_farben = [f.name for f in spielparameter.variante.erlaubteFarben]
+            for farbe in versuch:
+                if farbe not in erlaubte_farben:
+                    zeige_fehlermeldung(f"Die Farbe '{farbe}' ist nicht erlaubt!")
+                    return  # Abbrechen, Zeile wird NICHT erhöht
+
+            # --- NUR BEI GÜLTIGEM VERSUCH: WEITERMITTELN UND ZEILE ERHÖHEN ---
             on_rateversuch_erhalten(versuch, aktuelle_zeile)
 
-            if aktuelle_zeile < 9:
+            if aktuelle_zeile < 9:  # Nur erhöhen, wenn der Versuch gültig war
                 aktuelle_zeile += 1
 
         tk.Button(
