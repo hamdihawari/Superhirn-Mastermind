@@ -22,13 +22,17 @@ class SpielEngine(EngineInt):
         self.com = ComPort()
         if param.modus.online:
             self.com.starte(param.variante)
+            self.runde =0
 
     def fuehreZugAus(self,code:Code)->Feedback:
         if self.modus == Modus.C_M_ONLINE  or self.modus == Modus.C_C_ONLINE:
+            self.runde+=1
             return self.com.sendeVersuch(code)
         return self.spiel.fuehreRateversuchDurch(code)
 
     def istFertig(self)->bool:
+        if self.modus.online:
+            return self.runde >= self.spiel.variante.maxVersuche
         return self.spiel.istFertig()
 
 
