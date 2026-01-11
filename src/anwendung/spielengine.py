@@ -11,7 +11,7 @@ from src.spiel.spielCodes import Feedback
 from src.spiel.spielCodes import Code
 
 
-class EngineInt(ABC):
+class EngineInterface(ABC):
 
     @abstractmethod
     def fuehreZugAus(self,code:Code)->Feedback:
@@ -25,7 +25,7 @@ class EngineInt(ABC):
     def letzteRunde(self):
         pass
 
-class SpielEngine(EngineInt):
+class SpielEngine(EngineInterface):
 
     def __init__(self,param:Spielparameter):
         self.modus = param.modus
@@ -68,9 +68,9 @@ class SpielEngine(EngineInt):
         return self.spiel.runden[-1]
 
 
-class VergleichsEngine(EngineInt):
+class VergleichsEngine(EngineInterface):
 
-    def __init__(self, engine_a: EngineInt, engine_b: EngineInt):
+    def __init__(self, engine_a: EngineInterface, engine_b: EngineInterface):
         self.engine_a = engine_a
         self.engine_b = engine_b
 
