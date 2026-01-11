@@ -13,7 +13,8 @@ class Sprache(Enum):
         "algorithmus_auswaehlen": "Algorithmus auswählen:",
         "zeitverzoegerung": "Zeitverzögerung der Maschine in Sekunden:",
         "zurueck": "Zurück",
-        "starten": "Spiel starten"
+        "starten": "Spiel starten",
+        "bestaetige_rateversuch": "Rateversuch bestätigen"
     }
 
     ENGLISCH = {
@@ -28,7 +29,8 @@ class Sprache(Enum):
         "algorithmus_auswaehlen": "Select algorithm:",
         "zeitverzoegerung": "Machine delay in seconds:",
         "zurueck": "Back",
-        "starten": "Game start"
+        "starten": "Game start",
+        "bestaetige_rateversuch": "Confirm rate attempt"
     }
 
     def __init__(self, translations):
@@ -92,3 +94,7 @@ class Sprache(Enum):
     @property
     def starten(self):
         return self._translations["starten"]
+
+    @property
+    def bestaetige_rateversuch(self):
+        return self._translations["bestaetige_rateversuch"]
