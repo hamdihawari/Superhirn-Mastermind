@@ -13,7 +13,6 @@ from src.spiel.variante import Variante
 class ComputerPlayer(Player):
     def __init__(self, algorithmus_name: str | None = None):
         self.algo = AlgorithmusFactory.create(algorithmus_name)
-        print(" --- COMPUTER PLAYER INITIALIZATION ---")
 
     def generiereGeheimeCode(self, variante: Variante) -> Code:
 

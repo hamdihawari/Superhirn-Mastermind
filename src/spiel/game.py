@@ -33,8 +33,6 @@ class Game:
 
         # Rater initialisieren
         if self.modus.rater == "computer":
-            print(f"ALGORITHMUS IST : {param.algorithmus}")
-            print(type(param.algorithmus))
             self.rater = ComputerPlayer(param.algorithmus)
         else:
             self.rater = MenschPlayer()
@@ -56,13 +54,6 @@ class Game:
             erfolgreich=erfolgreich
         )
         self.runden.append(runde)
-
-        # DEBUG-Ausgabe der Spielrunde
-        print(f"\n Runde {runde.rundenNr}")
-        print("Geratener Code :", [f.name for f in runde.code.farben])
-        print(f"Feedback       : {runde.feedback.schwarz} schwarz,"
-              f" {runde.feedback.weiss} weiß")
-
         self.istFertig()
         return feedback
 
@@ -78,10 +69,6 @@ class Game:
         # Listen mit Optional[Farbe] erstellen
         geheim: list[Optional[Farbe]] = list(self.secret_code.farben)
         geraten: list[Optional[Farbe]] = list(rate_code.farben)
-
-        print("-------im Game Layer - Feedback ----------")
-        print(f"so sieht der geratete Code aus : {geheim}")
-        print(f"so sieht der geratete Code aus : {geraten}")
 
         schwarz = 0
         weiss = 0
