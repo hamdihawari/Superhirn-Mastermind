@@ -11,7 +11,13 @@ from spiel.variante import Variante
 from spiel.spielCodes import Code
 from ui.sprache import Sprache
 
-
+"""
+Ist die Schnittstelle des Spiels und verantwortlich für
+    - UI-Verwaltung (Wechsel zwischen Menüs, Spieloberfläche)
+    - Spielzustand (Variante, Modus, Algorithmus, Sprache)
+    - Eingaben & Callbacks (Benutzerinteraktionen verarbeiten)
+    - starten des Spiels 
+"""
 class GameController:
 
     def __init__(self, root: tk.Tk):
@@ -37,6 +43,14 @@ class GameController:
     # --------------------------------------------------
     # UI: Übersicht
     # --------------------------------------------------
+    """
+    Methode für die Übersicht - erstellt das Hauptmenü 
+    --> über eine callback wird zu Spieleinstellungen gewechselt 
+        die Eingaben von der Übersicht beeinflussen die Settings 
+        - Variante wird gesetzt (z.B. Superhirn)
+        - Modus wird gesetzt (z.B. Mensch als Rater)
+        - Sprache wird gesetzt (z.B. English)
+    """
     def show_uebersicht(self):
         self._clear_frames()
 
@@ -54,6 +68,11 @@ class GameController:
     # --------------------------------------------------
     # UI: Spieleinstellungen
     # --------------------------------------------------
+    """
+    Methode für die Einstellungen
+    --> über die callback kann zurück zu Übersicht gewechselt werden 
+        die Eingaben der Einstellungen beeinflussen 
+    """
     def show_spieleinstellungen(self):
         self._clear_frames()
 
