@@ -124,10 +124,12 @@ class GameController:
             self.spiel_engine = VergleichsEngine(e1, e2)
             self.setup_ui_vergleich(spielparameter)
 
+
         # Singlemodus
         else:
             self.spiel_engine = starter.starteSpiel(spielparameter)
             self.setup_ui_single(spielparameter)
+
 
 
     # --------------------------------------------------
@@ -150,7 +152,7 @@ class GameController:
 
         self.spieloberflaeche_frame.pack(fill="both", expand=True)
 
-        # ✅ Auto-Raten erst NACH dem Rendern starten
+
         if self.spielModus.rater == "computer":
             self.root.after(100, self.auto_raten_single)
 

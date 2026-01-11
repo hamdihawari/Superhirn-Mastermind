@@ -25,21 +25,26 @@ class EngineInt(ABC):
 class SpielEngine(EngineInt):
 
     def __init__(self,param:Spielparameter):
-        self.spiel = Game(param)
         self.modus = param.modus
+        if not self.modus.online:
+            self.spiel = Game(param)
+        print(param.modus.online)
         self.com :ComPort
         # self.runde = 0
+        #falls Online-Modus, dann wird ComPort gestartet
         if param.modus.online:
             self.com=ComJson()
             self.com.starte(param.variante)
             self.runde =0
 
+    #gibt den Sendeversuch and SpielLayer oder Comlayer weiter
     def fuehreZugAus(self,code:Code)->Feedback:
         if self.modus == Modus.C_M_ONLINE  or self.modus == Modus.C_C_ONLINE:
             self.runde+=1
             return self.com.sendeVersuch(code)
         return self.spiel.fuehreRateversuchDurch(code)
 
+    #prüft bei Online-Modus ob Spiel maxVersuche erreicht hat, und bei Offline gibt es weiter an SpielLayer
     def istFertig(self)->bool:
         if self.modus.online:
             return self.runde >= self.spiel.variante.maxVersuche
