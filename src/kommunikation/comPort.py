@@ -3,7 +3,6 @@ from src.spiel.spielCodes import Code, Feedback
 from src.spiel.variante import Variante
 from src.spiel.farbe import Farbe
 import requests as rq
-import responses
 
 
 class ComPort(ABC):
@@ -36,7 +35,7 @@ class ComJson(ComPort):
                       "positions" : 0,
                       "colors" : 0,
                       "value" : ""}
-
+    @responses.activate
     def starte(self, variante: Variante) -> bool:
         v = variante
 
@@ -69,6 +68,7 @@ class ComJson(ComPort):
 
         # übersetzten Farbencode in message schreiben
         self.message["value"] = uebersetzter_code
+
 
         # request mit übersetztem code schicken und Antwort emfpangen
         response = rq.post("http://141.45.34.161:5001/", json = self.message)
