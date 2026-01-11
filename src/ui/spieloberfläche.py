@@ -113,6 +113,7 @@ def create_spieloberfläche(
             canvas.itemconfig(steine[spalte], fill=farbe_hex)
 
     def zeige_feedback(zeile: int, feedback):
+
         feedback_steine = alle_zeilen[zeile]["feedback"]
 
         index = 0
@@ -155,7 +156,11 @@ def create_spieloberfläche(
 
 
     if sichtbarkeiten["show_code_auswahl_spiel_ui"]:
-        # --- Bestätigungsbutton (unter dem Dropdown) ---
+        """
+        Rateversuch wird bestätigt und zurück an den controller gegeben --> dann an die Spiellogik
+        Validierung: 
+            - Wenn Superhirn Weiß als Farbe gewählt wird, dann soll einer Fehler ausgegeben werden 
+        """
         def bestätige_rateversuch():
             nonlocal aktuelle_zeile
             versuch = []
@@ -165,7 +170,7 @@ def create_spieloberfläche(
                 versuch.append(farbe_name)
 
             # --- VALIDIERUNG DIREKT IN DER GUI ---
-            if "WEISS" in versuch:
+            if "WEISS" in versuch and spielparameter.variante == Variante.SUPER:
                 zeige_fehlermeldung("Keine weißen Steine übrig lassen.")
                 return  # Abbrechen, Zeile wird NICHT erhöht
 

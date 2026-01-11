@@ -1,243 +1,227 @@
 import tkinter as tk
 from typing import List
 
-from anwendung import spielengine, spielstart
+from anwendung.spielengine import VergleichsEngine
 from anwendung.spielstart import Spielstarter
-from src.spiel.farbe import Farbe
 from anwendung.modus import Modus
+
 from src.anwendung.spielparameter import Spielparameter
-from src.spiel.variante import Variante
-from src.ui.sprache import Sprache
-from src.spiel.spielCodes import Code
-from ui.sichtbarkeiten import Sichtbarkeiten
-
-# Hauptfenster
-root = tk.Tk()
-root.title("Superhirn")
-root.geometry("800x600")
-#root.resizable(False, False)
-
-# Globale Variablen für die Frames
-uebersicht_frame = None
-spieleinstellungen_frame = None
-spieloberflaeche_frame = None
+from src.spiel.farbe import Farbe
+from spiel.variante import Variante
+from spiel.spielCodes import Code
+from ui.sprache import Sprache
 
 
-# Standardwerte
-spielVariante = Variante.SUPER
-spielModus = Modus.M_C
-spielAlgorithmus = "knuth"
-spielSprache = Sprache.DEUTSCH
-spielcode = None
-spielZeit = None
+class GameController:
 
-# --- Funktionen zum Setzen der Parameter ---
-def set_variante(variante: Variante):
-    global spielVariante
-    spielVariante = variante
+    def __init__(self, root: tk.Tk):
+        self.root = root
 
-def set_modus(modus: Modus):
-    global spielModus, spieleinstellungen_frame
-    spielModus = modus
-    # print(f"Modus geändert auf: {modus}")                         # Debug
+        # Frames
+        self.uebersicht_frame = None
+        self.spieleinstellungen_frame = None
+        self.spieloberflaeche_frame = None
 
-def set_sprache(sprache: Sprache):
-    global spielSprache
-    spielSprache = sprache
+        # Spielzustand
+        self.spielVariante = Variante.SUPER
+        self.spielModus = Modus.M_C
+        self.spielAlgorithmus = "knuth"
+        self.spielSprache = Sprache.DEUTSCH
 
-def set_algorithm(algorithm: str):
-    global spielAlgorithmus
-    spielAlgorithmus = algorithm
+        # Engine & Timing
+        self.spiel_engine = None
+        self.delay = 1  # Sekunden
 
-def set_code(code: Code):
-    global spielcode
-    spielcode = code
+        self.show_uebersicht()
 
-def set_zeit(zeit: int):
-    global spielZeit
-    spielZeit = zeit
+    # --------------------------------------------------
+    # UI: Übersicht
+    # --------------------------------------------------
+    def show_uebersicht(self):
+        self._clear_frames()
 
-# --- Frame-Wechsel-Funktionen ---
-def show_uebersicht():
-    global uebersicht_frame, spieleinstellungen_frame
-    if spieleinstellungen_frame:
-        spieleinstellungen_frame.pack_forget()
-    if uebersicht_frame:
-        uebersicht_frame.destroy()
+        from Uebersichtsbildschirm import create_uebersicht_frame
+        self.uebersicht_frame = create_uebersicht_frame(
+            self.root,
+            self.show_spieleinstellungen,
+            self.set_variante,
+            self.set_modus,
+            self.set_sprache,
+            self.spielSprache
+        )
+        self.uebersicht_frame.pack(fill="both", expand=True)
 
-    # Dynamischer Import (vermeidet zirkuläre Abhängigkeit)
-    from Uebersichtsbildschirm import create_uebersicht_frame
-    uebersicht_frame = create_uebersicht_frame(
-        root,
-        show_spieleinstellungen,
-        set_variante,
-        set_modus,
-        set_sprache,
-        spielSprache
-    )
-    uebersicht_frame.pack(fill="both", expand=True)
+    # --------------------------------------------------
+    # UI: Spieleinstellungen
+    # --------------------------------------------------
+    def show_spieleinstellungen(self):
+        self._clear_frames()
 
-def show_spieleinstellungen():
-    global spieleinstellungen_frame, uebersicht_frame
+        from Spieleinstellungen import create_spieleinstellungen_superhirn_frame
+        self.spieleinstellungen_frame = create_spieleinstellungen_superhirn_frame(
+            self.root,
+            self.show_uebersicht,
+            self.on_code_spiel_start,
+            self.set_algorithm,
+            self.spielVariante.steckplaetze,
+            self.spielVariante,
+            self.spielModus,
+            self.spielSprache
+        )
+        self.spieleinstellungen_frame.pack(fill="both", expand=True)
 
-    if uebersicht_frame:
-        uebersicht_frame.pack_forget()
+    # --------------------------------------------------
+    # SETTER
+    # --------------------------------------------------
+    def set_variante(self, variante: Variante):
+        self.spielVariante = variante
 
-    if spieleinstellungen_frame:
-        spieleinstellungen_frame.destroy()
+    def set_modus(self, modus: Modus):
+        self.spielModus = modus
 
-    sichtbarkeiten = Sichtbarkeiten.get_sichtbarkeit(spielModus)
+    def set_sprache(self, sprache: Sprache):
+        self.spielSprache = sprache
 
-    from Spieleinstellungen import create_spieleinstellungen_superhirn_frame
-    # Erstelle das neue Frame
-    spieleinstellungen_frame = create_spieleinstellungen_superhirn_frame(
-        root,
-        show_uebersicht,
-        on_code_spiel_start,
-        set_algorithm,
-        spielVariante.steckplaetze,
-        spielVariante,
-        spielModus,
-        spielSprache
-    )
-    spieleinstellungen_frame.pack(fill="both", expand=True)
+    def set_algorithm(self, algorithmus: str):
+        self.spielAlgorithmus = algorithmus
 
-# --- Haupt-Callback für Spielstart ---
-"""
-    beim ausführen von spiel Starten Button soll 
-    1. Spieloberfläche erzeugt werden und Spielstart erzeugt werden -> danach wird ein EngineInt zurückgegeben
+    # --------------------------------------------------
+    # SPIELSTART
+    # --------------------------------------------------
+    def on_code_spiel_start(self, code: Code, zeit: int):
 
-"""
+        self.delay = zeit
 
+        algorithmus = (
+            self.spielAlgorithmus
+            if self.spielModus.rater == "computer"
+            else None
+        )
 
+        spielparameter = Spielparameter(
+            variante=self.spielVariante,
+            modus=self.spielModus,
+            algorithmus=algorithmus,
+            delay=zeit,
+            code=code
+        )
 
-def on_code_spiel_start(code: Code, zeit: int):
-    global spieloberflaeche_frame
+        starter = Spielstarter()
+        self._clear_frames()
 
-    algorithmus = spielAlgorithmus if spielModus.rater == "computer" else None
+        # Vergleichsmodus
+        if algorithmus == "beide_algorithmen":
+            p1 = Spielparameter(
+                self.spielVariante, self.spielModus, "knuth", zeit, code
+            )
+            p2 = Spielparameter(
+                self.spielVariante, self.spielModus, "step_by_step", zeit, code
+            )
 
-    spielparameter = Spielparameter(
-        variante=spielVariante,
-        modus=spielModus,
-        algorithmus=algorithmus,
-        delay=zeit,
-        code=code
-    )
+            e1 = starter.starteSpiel(p1)
+            e2 = starter.starteSpiel(p2)
 
-    # Debug-Ausgabe
-    print("\n--- Spielparameter ---")
-    print(f"Variante: {spielparameter.variante.name}")
-    print(f"Modus: {spielparameter.modus.name}")
-    print(f"der Codierer ist {spielparameter.modus.codierer}")
-    print(f"Algorithmus: {spielparameter.algorithmus}")
-    print(f"Verzögerung: {spielparameter.delay} Sekunden")
-    if code is not None:
-        print("SpielCode:", [f.name for f in code.farben])                   # gibt das jeweilige Element aus .name aus der ENUM
-    else:
-        print("Code: None")
-    print("-------------------------------")
+            self.spiel_engine = VergleichsEngine(e1, e2)
+            self.setup_ui_vergleich(spielparameter)
 
-    # Spiel starten und Engine-Objekt erhalten
-    starter = Spielstarter()
-    spiel_engine = starter.starteSpiel(spielparameter)
-
-    """
-    Mensch ist Codierer
-        -> empfangen von rateversuch und feedback
-        und Ausgabe in der spieloberfläche 
-    """
-    def rateversuch_erhalten_mensch_Codierer():
-        feedback = spiel_engine.fuehreZugAus(None)
-        letzte_runde = spiel_engine.spiel.runden[-1]
-        zeile = letzte_runde.rundenNr - 1
-
-        # Zeige den Ratecode des Computers an
-        runde_code = letzte_runde.code
-
-        zeige_feedback(zeile, feedback)             # Hier wird das Feedback an die GUI übergeben, siehe unten bei Erstellung der GUI
+        # Singlemodus
+        else:
+            self.spiel_engine = starter.starteSpiel(spielparameter)
+            self.setup_ui_single(spielparameter)
 
 
-        print(f"Aktueller Ratecode: {[f.name for f in runde_code.farben]}")  # Debug-Ausgabe
-        zeige_runde_code(zeile, runde_code)
+    # --------------------------------------------------
+    # UI SETUP
+    # --------------------------------------------------
+    def setup_ui_single(self, spielparameter):
+        from ui.spieloberfläche import create_spieloberfläche
 
-        if spiel_engine.istFertig():
-            print("Spiel beendet")
+        (
+            self.spieloberflaeche_frame,
+            self.zeige_feedback,
+            self.zeige_code,
+            self.zeige_fehler
+        ) = create_spieloberfläche(
+            self.root,
+            spielparameter,
+            self.on_rateversuch_mensch_rater,
+            self.spielModus
+        )
 
-    """
-    mit einen Timer von 1 - 5 sekunden wird der Rateversuch ausgegeben 
-    """
-    def auto_raten():
-        if not spiel_engine.istFertig():
-            rateversuch_erhalten_mensch_Codierer()
-            root.after(spielparameter.delay * 1000, auto_raten)
+        self.spieloberflaeche_frame.pack(fill="both", expand=True)
 
-    """
-    Mensch ist Rater 
-    
-    Einziger Callback: Empfängt den Rateversuch vom GUI
-        Wird aufgerufen, wenn der Spieler einen Versuch bestätigt 
-    """
+        # ✅ Auto-Raten erst NACH dem Rendern starten
+        if self.spielModus.rater == "computer":
+            self.root.after(100, self.auto_raten_single)
 
-    def on_rateversuch_erhalten_menschRater(versuch: List[str], zeile: int):
+    def setup_ui_vergleich(self, spielparameter):
+        container = tk.Frame(self.root)
+        container.pack(fill="both", expand=True)
+        self.spieloberflaeche_frame = container
 
+        left = tk.Frame(container)
+        right = tk.Frame(container)
+        left.pack(side="left", fill="both", expand=True)
+        right.pack(side="right", fill="both", expand=True)
+
+        from ui.spieloberfläche import create_spieloberfläche
+
+        (_, self.zeige_feedback_A, self.zeige_code_A, _) = create_spieloberfläche(
+            left, spielparameter, None, self.spielModus
+        )
+
+        (_, self.zeige_feedback_B, self.zeige_code_B, _) = create_spieloberfläche(
+            right, spielparameter, None, self.spielModus
+        )
+
+        self.root.after(100, self.auto_raten_vergleich)
+
+    # --------------------------------------------------
+    # CALLBACKS
+    # --------------------------------------------------
+    def on_rateversuch_mensch_rater(self, versuch: List[str], zeile: int):
         farb_versuch = Code([Farbe[farbe] for farbe in versuch])
         farb_namen = [f.name for f in farb_versuch.farben]
         print(f"Farben des Rateversuchs: {farb_namen}")
 
-        feedback = spiel_engine.fuehreZugAus(farb_versuch)
+        feedback = self.spiel_engine.fuehreZugAus(farb_versuch)
         print(f"Feedback: {feedback.schwarz} schwarz, {feedback.weiss} weiß")
-        zeige_feedback(zeile, feedback)
+        self.zeige_feedback(zeile, feedback)
 
-        if spiel_engine.istFertig():
-            print("Spiel beendet")
+    def auto_raten_single(self):
+        if not self.spiel_engine.istFertig():
+            self.spiel_engine.fuehreZugAus(None)
+            letzte = self.spiel_engine.letzteRunde()
 
+            z = letzte.rundenNr - 1
+            self.zeige_feedback(z, letzte.feedback)
+            self.zeige_code(z, letzte.code)
 
-    """
-    Computer ist Rater und Codierer 
-    
-    
+            self.root.after(self.delay * 1000, self.auto_raten_single)
 
-    def rateversuch_feedback_erhalten_computer_computer():
-        # speicher das Feedback
-        feedback = spiel_engine.fuehreZugAus(None)
+    def auto_raten_vergleich(self):
+        if not self.spiel_engine.istFertig():
+            self.spiel_engine.fuehreZugAus(None)
+            r = self.spiel_engine.letzteRunde()
 
+            z = r["A"].rundenNr - 1
 
-    def auto_raten_doppel_computer():
-        pass
-        
-    """
+            self.zeige_feedback_A(z, r["A"].feedback)
+            self.zeige_code_A(z, r["A"].code)
 
-    # Controller wird NICHT gebraucht (wir nutzen nur den Callback direkt)
-    if spieleinstellungen_frame:
-        spieleinstellungen_frame.pack_forget()
+            self.zeige_feedback_B(z, r["B"].feedback)
+            self.zeige_code_B(z, r["B"].code)
 
-    from spieloberfläche import create_spieloberfläche
-    if spieloberflaeche_frame:
-        spieloberflaeche_frame.destroy()
+            self.root.after(self.delay * 1000, self.auto_raten_vergleich)
 
-
-    """
-    Erstellung der Spieloberfläche 
-    """
-    spieloberflaeche_frame, zeige_feedback, zeige_runde_code, zeige_fehlermeldung = create_spieloberfläche(
-        root,
-        spielparameter,
-        on_rateversuch_erhalten_menschRater,  # Einziger Callback: Übermittelt den Versuch an den Controller
-        spielModus
-    )
-    spieloberflaeche_frame.pack(fill="both", expand=True)
-
-    # Speichere zeige_fehlermeldung global oder in einer Klasse, falls nötig
-    global fehlermeldung_funktion
-    fehlermeldung_funktion = zeige_fehlermeldung
-
-    if spielModus.codierer == "mensch":
-        auto_raten()
-
-
-    if spielModus.codierer == "computer" and spielModus.rater == "computer":
-        auto_raten()
-
-
-show_uebersicht()
-root.mainloop()
+    # --------------------------------------------------
+    # HELPER
+    # --------------------------------------------------
+    def _clear_frames(self):
+        for frame in (
+            self.uebersicht_frame,
+            self.spieleinstellungen_frame,
+            self.spieloberflaeche_frame
+        ):
+            if frame:
+                frame.destroy()
