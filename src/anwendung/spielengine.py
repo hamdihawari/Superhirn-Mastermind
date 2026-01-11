@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+
+from kommunikation.comPort import ComJson
 from src.anwendung.spielparameter import Spielparameter, Modus
 from src.kommunikation.comPort import ComPort
 from src.spiel.game import Game
@@ -25,9 +27,10 @@ class SpielEngine(EngineInt):
     def __init__(self,param:Spielparameter):
         self.spiel = Game(param)
         self.modus = param.modus
-        self.com = ComPort()
+        self.com :ComPort
         # self.runde = 0
         if param.modus.online:
+            self.com=ComJson()
             self.com.starte(param.variante)
             self.runde =0
 
