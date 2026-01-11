@@ -25,8 +25,10 @@ class EngineInt(ABC):
 class SpielEngine(EngineInt):
 
     def __init__(self,param:Spielparameter):
-        self.spiel = Game(param)
         self.modus = param.modus
+        if not self.modus.online:
+            self.spiel = Game(param)
+        print(param.modus.online)
         self.com :ComPort
         # self.runde = 0
         #falls Online-Modus, dann wird ComPort gestartet
