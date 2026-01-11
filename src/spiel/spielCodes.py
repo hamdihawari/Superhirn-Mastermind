@@ -21,6 +21,11 @@ class Code:
 
 
 class Feedback:
+    """
+    Args:
+        schwarz(int): richtige Farbe, richtige Posi
+        weiss(int): richtige Farbe, falsche Posi
+    """
 
     def __init__(self, schwarz: int, weiss: int):
         self.schwarz = schwarz

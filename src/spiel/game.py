@@ -15,6 +15,7 @@ class Game:
         self.modus = param.modus
         self.variante = param.variante
 
+        # Codierer initialisieren (Computer oder Mensch)
         if self.modus.codierer == "computer":
             try:
                 self.codierer = ComputerPlayer(None)
@@ -42,11 +43,15 @@ class Game:
 
     def fuehreRateversuchDurch(self,code:Code | None) -> Feedback:
 
+        # Computer generiert eigenen Rateversuch
         if self.modus.rater == "computer":
             code=self.rater.generiereVersuchMitVariante(self.runden,self.variante)
+
+        # Feedback berechnen
         feedback = self.berechneFeedback(code)
         erfolgreich = feedback.schwarz == self.variante.steckplaetze
 
+        # Runde speichern
         runde = SpielRunde(
             code=code,
             feedback=feedback,
@@ -58,13 +63,14 @@ class Game:
         return feedback
 
     def istFertig(self) -> bool:
+        # Spiel endet bei Erfolg oder maximaler Rundenzahl
         return any(r.erfolgreich for r in self.runden) or \
                len(self.runden) >= self.variante.maxVersuche
 
 
 
     #Hilfsmethode für fuehreRateversuchDurch
-
+    # Berechnet schwarzes und weißes Feedback
     def berechneFeedback(self, rate_code: Code) -> Feedback:
         # Listen mit Optional[Farbe] erstellen
         geheim: list[Optional[Farbe]] = list(self.secret_code.farben)
@@ -73,12 +79,14 @@ class Game:
         schwarz = 0
         weiss = 0
 
+        # Schwarze Treffer (richtige Farbe, richtige Position)
         for i in range(len(geheim)):
             if geraten[i] == geheim[i]:
                 schwarz += 1
                 geheim[i] = None
                 geraten[i] = None
 
+        # Weiße Treffer (richtige Farbe, falsche Position)
         for i in range(len(geraten)):
             if geraten[i] is not None and geraten[i] in geheim:
                 weiss += 1
