@@ -35,7 +35,6 @@ class ComJson(ComPort):
                       "positions" : 0,
                       "colors" : 0,
                       "value" : ""}
-    @responses.activate
     def starte(self, variante: Variante) -> bool:
         v = variante
 
