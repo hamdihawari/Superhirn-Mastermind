@@ -60,7 +60,7 @@ class StepByStep(AlgorithmusStrategie):
                     eval_feedback(s, guess).weiss == fb.weiss)
             ]
 
-        print("candidates:", len(candidates))
+
 
         for c in candidates:
             if tuple(c.farben) not in used:

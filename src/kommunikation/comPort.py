@@ -3,6 +3,7 @@ from src.spiel.spielCodes import Code, Feedback
 from src.spiel.variante import Variante
 from src.spiel.farbe import Farbe
 import requests as rq
+import responses
 
 
 class ComPort(ABC):

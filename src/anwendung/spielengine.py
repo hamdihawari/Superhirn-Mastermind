@@ -1,7 +1,10 @@
 from abc import ABC, abstractmethod
 
 from kommunikation.comPort import ComJson
-from src.anwendung.spielparameter import Spielparameter, Modus
+from spiel.spielrunde import SpielRunde
+from spiel.strategie.algorithmen.knuth import Knuth
+from src.anwendung.spielparameter import Spielparameter
+from src.anwendung.modus import Modus
 from src.kommunikation.comPort import ComPort
 from src.spiel.game import Game
 from src.spiel.spielCodes import Feedback
@@ -26,9 +29,9 @@ class SpielEngine(EngineInt):
 
     def __init__(self,param:Spielparameter):
         self.modus = param.modus
+        self.variante = param.variante
         if not self.modus.online:
             self.spiel = Game(param)
-        print(param.modus.online)
         self.com :ComPort
         # self.runde = 0
         #falls Online-Modus, dann wird ComPort gestartet
@@ -36,21 +39,32 @@ class SpielEngine(EngineInt):
             self.com=ComJson()
             self.com.starte(param.variante)
             self.runde =0
+            self.algo = Knuth()
+            self.spielrunde: list[SpielRunde] = []
+
 
     #gibt den Sendeversuch and SpielLayer oder Comlayer weiter
     def fuehreZugAus(self,code:Code)->Feedback:
-        if self.modus == Modus.C_M_ONLINE  or self.modus == Modus.C_C_ONLINE:
-            self.runde+=1
-            return self.com.sendeVersuch(code)
+        if self.modus.online:
+            self.runde += 1
+            if self.modus.rater == "mensch":
+                return self.com.sendeVersuch(code)
+            else:
+                farbencode = self.algo.berechneNaechstenVersuch(self.spielrunde, self.variante)
+                feedback = self.com.sendeVersuch(farbencode)
+                self.spielrunde.append(SpielRunde(farbencode,feedback,self.runde, False))
+                return feedback
         return self.spiel.fuehreRateversuchDurch(code)
 
     #prüft bei Online-Modus ob Spiel maxVersuche erreicht hat, und bei Offline gibt es weiter an SpielLayer
     def istFertig(self)->bool:
         if self.modus.online:
-            return self.runde >= self.spiel.variante.maxVersuche
+            return self.runde >= self.variante.maxVersuche
         return self.spiel.istFertig()
 
     def letzteRunde(self):
+        if self.modus.online:
+            return self.spielrunde[-1]
         return self.spiel.runden[-1]
 
 
@@ -77,7 +91,7 @@ class VergleichsEngine(EngineInt):
         return feedback_a
 
     def istFertig(self) -> bool:
-        return self.engine_a.istFertig() and self.engine_b.istFertig()
+        return self.engine_a.istFertig() or self.engine_b.istFertig()
 
     def letzteRunde(self):
         return {

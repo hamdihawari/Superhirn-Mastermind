@@ -1,3 +1,4 @@
+from anwendung.modus import Modus
 from src.anwendung import modus
 from src.anwendung.spielparameter import Spielparameter
 from src.spiel.farbe import Farbe
