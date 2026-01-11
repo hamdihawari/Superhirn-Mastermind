@@ -26,6 +26,7 @@ def test_start_superhirn_true():
     assert b
     assert positionen == 4
     assert anzahl_farben == 6
+    assert test_objekt.message["gameid"] == 123
 
 
 @responses.activate
@@ -66,6 +67,7 @@ def test_start_super_superhirn_true():
     assert b
     assert positionen == 5
     assert anzahl_farben == 8
+    assert test_objekt.message["gameid"] == 123456
 
 @responses.activate
 def test_start_super_superhirn_false():
