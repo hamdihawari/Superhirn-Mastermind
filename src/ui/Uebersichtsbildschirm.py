@@ -112,8 +112,8 @@ def create_uebersicht_frame(root, next_callback, set_variante_callback, set_modu
         Modus.M_C: "Mensch-Computer",
         Modus.C_M: "Computer-Mensch",
         Modus.C_C: "Computer-Computer",
-        Modus.C_M_ONLINE: "Computer-Mensch(On)",
-        Modus.C_C_ONLINE: "Computer-Computer(On)"
+        Modus.C_M_ONLINE: "C-M Online",
+        Modus.C_C_ONLINE: "C-C Online"
     }
 
     modus_auswahl = tk.StringVar(value="Mensch-Computer")  # Standardwert
