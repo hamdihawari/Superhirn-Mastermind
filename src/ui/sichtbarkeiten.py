@@ -10,19 +10,30 @@ class Sichtbarkeiten:
                 "show_farbe": False,
                 "show_algorithmus": False,
                 "show_zeit": False,
-                "show_code_auswahl": False
+                "show_code_auswahl": False,
+                "show_code_auswahl_spiel_ui": True
             }
-        elif modus == Modus.C_M or modus == Modus.C_C:  # Expliziter Vergleich statt `in`
+        elif modus == Modus.C_M:  # Expliziter Vergleich statt `in`
             return {
                 "show_farbe": False,
                 "show_algorithmus": False,
+                "show_zeit": False,
+                "show_code_auswahl": False,
+                "show_code_auswahl_spiel_ui": True
+            }
+        elif modus == Modus.C_C:
+            return {
+                "show_farbe": False,
+                "show_algorithmus": True,
                 "show_zeit": True,
-                "show_code_auswahl": False
+                "show_code_auswahl": False,
+                "show_code_auswahl_spiel_ui": False
             }
         else:  # Modus.M_C
             return {
                 "show_farbe": True,
                 "show_algorithmus": True,
                 "show_zeit": True,
-                "show_code_auswahl": True
+                "show_code_auswahl": True,
+                "show_code_auswahl_spiel_ui": False
             }

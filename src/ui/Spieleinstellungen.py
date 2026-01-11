@@ -19,7 +19,6 @@ def create_spieleinstellungen_superhirn_frame(
 
     # Sichtbarkeiten basierend auf dem Modus holen
     sichtbarkeiten = Sichtbarkeiten.get_sichtbarkeit(spielmodus)
-    print(f"Sichtbarkeiten in create_spieleinstellungen_superhirn_frame: {sichtbarkeiten}")  # Debug-Ausgabe
 
     frame = tk.Frame(root)
     farbe_vars = []  # Speichert alle StringVars der OptionMenüs
@@ -85,7 +84,7 @@ def create_spieleinstellungen_superhirn_frame(
         )
         algorithmus_label.pack(anchor="nw", pady=2)
 
-        algorithmen = ["Knuth", "Step-by-Step"]
+        algorithmen = ["knuth", "step_by_step", "beide_algorithmen"]
         algorithmen_auswahl = tk.StringVar(value="Knuth")
 
         def on_algorithm_auswahl_change(*args):

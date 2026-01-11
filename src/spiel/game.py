@@ -1,40 +1,49 @@
-from typing import List
 from src.anwendung import modus
 from src.anwendung.spielparameter import Spielparameter
 from src.spiel.farbe import Farbe
 from src.spiel.spielCodes import Code, Feedback
 from src.spiel.spielrunde import SpielRunde
 from src.spiel.strategie.player import Player
-from src.spiel.variante import Variante
 from typing import Optional
-from typing import Optional
-from src.spiel.strategie.playerType import ComputerPlayer, HumanPlayer
 
+from src.spiel.strategie.ComputerPlayer import ComputerPlayer
+from src.spiel.strategie.MenschPlayer import MenschPlayer
 
 
 class Game:
-    def __init__(self,param:Spielparameter):
+    def __init__(self, param: Spielparameter):
         self.modus = param.modus
-        self.variante=param.variante
+        self.variante = param.variante
+
         if self.modus.codierer == "computer":
-            self.codierer = ComputerPlayer(param.algorithmus)
-            print(f"Variante im Game Layer: {self.variante}")
-            self.secret_code=self.codierer.generiereGeheimeCode(self.variante)
-            print(f"Code im Game Layer: {self.secret_code}")
+            try:
+                self.codierer = ComputerPlayer(None)
+                test_code = self.codierer.generiereGeheimeCode(self.variante)
+                self.secret_code = test_code
+            except Exception as e:
+                print(f"FEHLER: {e}")
+                import traceback
+                traceback.print_exc()  # Vollständiger Stacktrace
+                raise
         else:
-            self.codierer=HumanPlayer()
-            self.secret_code=param.code
+            self.codierer = MenschPlayer()
+            if param.code is None:
+                raise ValueError(f"Im Modus {self.modus.name} muss ein Code übergeben werden!")
+            self.secret_code = param.code
+
+        # Rater initialisieren
         if self.modus.rater == "computer":
             self.rater = ComputerPlayer(param.algorithmus)
         else:
-            self.rater=HumanPlayer()
+            self.rater = MenschPlayer()
+
         self.runden: list[SpielRunde] = []
         self.erfolgreich = False
 
-    def fuehreRateversuchDurch(self,code:Code) -> Feedback:
-        if self.rater == "computer":
-            code=self.rater.generiereVersuch(self.runden)
+    def fuehreRateversuchDurch(self,code:Code | None) -> Feedback:
 
+        if self.modus.rater == "computer":
+            code=self.rater.generiereVersuchMitVariante(self.runden,self.variante)
         feedback = self.berechneFeedback(code)
         erfolgreich = feedback.schwarz == self.variante.steckplaetze
 
@@ -51,8 +60,6 @@ class Game:
     def istFertig(self) -> bool:
         return any(r.erfolgreich for r in self.runden) or \
                len(self.runden) >= self.variante.maxVersuche
-
-
 
 
 
