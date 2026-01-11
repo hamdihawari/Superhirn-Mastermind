@@ -1,4 +1,3 @@
-
 from src.spiel.spielCodes import Code,Feedback
 
 class SpielRunde:

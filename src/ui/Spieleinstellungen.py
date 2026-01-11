@@ -84,8 +84,11 @@ def create_spieleinstellungen_superhirn_frame(
         )
         algorithmus_label.pack(anchor="nw", pady=2)
 
-        algorithmen = ["knuth", "step_by_step", "knuth_vs_step"]
-        algorithmen_auswahl = tk.StringVar(value="Knuth")
+        algorithmen = ["knuth", "step_by_step"]
+        if sichtbarkeiten.get("show_knuth_vs_step", False):  # Nur anzeigen, wenn erlaubt
+            algorithmen.append("knuth_vs_step")
+
+        algorithmen_auswahl = tk.StringVar(value=algorithmen[0])  # Standardwert
 
         def on_algorithm_auswahl_change(*args):
             selected_name = algorithmen_auswahl.get()

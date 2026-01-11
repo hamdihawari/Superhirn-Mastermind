@@ -11,7 +11,8 @@ class Sichtbarkeiten:
                 "show_algorithmus": False,
                 "show_zeit": False,
                 "show_code_auswahl": False,
-                "show_code_auswahl_spiel_ui": True
+                "show_code_auswahl_spiel_ui": True,
+                "show_knuth_vs_step": False  # Neue Eigenschaft
             }
         elif modus == Modus.C_M:  # Expliziter Vergleich statt `in`
             return {
@@ -19,15 +20,17 @@ class Sichtbarkeiten:
                 "show_algorithmus": False,
                 "show_zeit": False,
                 "show_code_auswahl": False,
-                "show_code_auswahl_spiel_ui": True
+                "show_code_auswahl_spiel_ui": True,
+                "show_knuth_vs_step": False  # Neue Eigenschaft
             }
         elif modus == Modus.C_C:
             return {
-                "show_farbe": False,
+                "show_farbe": True,
                 "show_algorithmus": True,
                 "show_zeit": True,
                 "show_code_auswahl": False,
-                "show_code_auswahl_spiel_ui": False
+                "show_code_auswahl_spiel_ui": False,
+                "show_knuth_vs_step": False  # Neue Eigenschaft
             }
         else:  # Modus.M_C
             return {
@@ -35,5 +38,6 @@ class Sichtbarkeiten:
                 "show_algorithmus": True,
                 "show_zeit": True,
                 "show_code_auswahl": True,
-                "show_code_auswahl_spiel_ui": False
+                "show_code_auswahl_spiel_ui": False,
+                "show_knuth_vs_step": True  # Neue Eigenschaft
             }
