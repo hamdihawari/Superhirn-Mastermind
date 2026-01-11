@@ -6,7 +6,7 @@ def main():
     root.title("Superhirn")
     root.geometry("800x600")
 
-    GameController(root)   # ✅ HIER wird alles gestartet
+    GameController(root)
 
     root.mainloop()
 

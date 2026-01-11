@@ -110,7 +110,7 @@ class GameController:
         self._clear_frames()
 
         # Vergleichsmodus
-        if algorithmus == "beide_algorithmen":
+        if algorithmus == "knuth_vs_step":
             p1 = Spielparameter(
                 self.spielVariante, self.spielModus, "knuth", zeit, code
             )
@@ -124,10 +124,12 @@ class GameController:
             self.spiel_engine = VergleichsEngine(e1, e2)
             self.setup_ui_vergleich(spielparameter)
 
+
         # Singlemodus
         else:
             self.spiel_engine = starter.starteSpiel(spielparameter)
             self.setup_ui_single(spielparameter)
+
 
 
     # --------------------------------------------------
@@ -145,12 +147,13 @@ class GameController:
             self.root,
             spielparameter,
             self.on_rateversuch_mensch_rater,
-            self.spielModus
+            self.spielModus,
+            self.spielSprache
         )
 
         self.spieloberflaeche_frame.pack(fill="both", expand=True)
 
-        # ✅ Auto-Raten erst NACH dem Rendern starten
+
         if self.spielModus.rater == "computer":
             self.root.after(100, self.auto_raten_single)
 
@@ -167,11 +170,11 @@ class GameController:
         from ui.spieloberfläche import create_spieloberfläche
 
         (_, self.zeige_feedback_A, self.zeige_code_A, _) = create_spieloberfläche(
-            left, spielparameter, None, self.spielModus
+            left, spielparameter, None, self.spielModus,self.spielSprache
         )
 
         (_, self.zeige_feedback_B, self.zeige_code_B, _) = create_spieloberfläche(
-            right, spielparameter, None, self.spielModus
+            right, spielparameter, None, self.spielModus, self.spielSprache
         )
 
         self.root.after(100, self.auto_raten_vergleich)

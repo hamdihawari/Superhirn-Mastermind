@@ -84,7 +84,7 @@ def create_spieleinstellungen_superhirn_frame(
         )
         algorithmus_label.pack(anchor="nw", pady=2)
 
-        algorithmen = ["knuth", "step_by_step", "beide_algorithmen"]
+        algorithmen = ["knuth", "step_by_step", "knuth_vs_step"]
         algorithmen_auswahl = tk.StringVar(value="Knuth")
 
         def on_algorithm_auswahl_change(*args):

@@ -14,7 +14,8 @@ def create_spieloberfläche(
     root,
     spielparameter: Spielparameter,
     on_rateversuch_erhalten: Callable,  # Einziger Callback: Sendet Rateversuch an Controller
-    spielmodus
+    spielmodus,
+    sprache
 ):
     sichtbarkeiten = Sichtbarkeiten.get_sichtbarkeit(spielmodus)
 
@@ -188,7 +189,7 @@ def create_spieloberfläche(
 
         tk.Button(
             steuerungs_frame,
-            text="Rateversuch bestätigen",
+            text=sprache.bestaetige_rateversuch,
             command=bestätige_rateversuch,
             bg="#4CAF50", fg="white",
             font=("Arial", 12, "bold")
