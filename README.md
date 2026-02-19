@@ -1,6 +1,6 @@
-# Superhirn (Mastermind) – WiSe 25/26
+# Superhirn (Mastermind)
 
-Projekt im Rahmen des Moduls **Software Engineering II** (HTW Berlin, WiSe 25/26 – Gruppe 21).  
+Projekt im Rahmen des Moduls **Software Engineering II** (HTW Berlin).  
 **Superhirn** ist eine erweiterbare Mastermind-Implementierung mit mehreren Spielmodi (lokal & optional online) und einer klaren Schichtenarchitektur.
 
 ---
